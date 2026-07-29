@@ -1,0 +1,28 @@
+{
+  "name": "assistpro",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @assistpro/web dev",
+    "dev:api": "pnpm --filter @assistpro/api start:dev",
+    "dev:all": "concurrently -n web,api -c magenta,cyan \"pnpm dev\" \"pnpm dev:api\"",
+    "build": "pnpm --filter @assistpro/web build",
+    "build:api": "pnpm --filter @assistpro/api build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "nx": "^23.1.0",
+    "typescript": "5.7.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "hono": "4.12.25"
+    },
+    "onlyBuiltDependencies": [
+      "nx",
+      "sharp"
+    ]
+  }
+}

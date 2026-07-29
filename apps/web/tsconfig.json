@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@assistpro/types": ["../../packages/types/src/index.ts"],
+      "@assistpro/types/*": ["../../packages/types/src/*"],
+      "@assistpro/ui": ["../../packages/ui/src/index.ts"],
+      "@assistpro/ui/*": ["../../packages/ui/src/*"],
+      "@assistpro/config": ["../../packages/config/src/index.ts"],
+      "@assistpro/config/*": ["../../packages/config/src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "../../packages/types/src/**/*.ts",
+    "../../packages/ui/src/**/*.ts",
+    "../../packages/ui/src/**/*.tsx",
+    "../../packages/config/src/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

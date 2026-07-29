@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@assistpro/types": ["packages/types/src/index.ts"],
+      "@assistpro/types/*": ["packages/types/src/*"],
+      "@assistpro/ui": ["packages/ui/src/index.ts"],
+      "@assistpro/ui/*": ["packages/ui/src/*"],
+      "@assistpro/config": ["packages/config/src/index.ts"],
+      "@assistpro/config/*": ["packages/config/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", ".next"]
+}
