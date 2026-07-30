@@ -1,14 +1,23 @@
 "use client"
 
+import { ServiceList } from "@/components/services/service-list"
 import { asaasIsMocked, billingTypeLabels } from "@/lib/asaas"
 import { nextBillingDay } from "@/lib/finance"
 import { pixKey } from "@/lib/mock/finance"
 import { businessHours } from "@/lib/mock/services"
 import { whatsappIsMocked } from "@/lib/whatsapp"
 import type { BillingType } from "@assistpro/types"
-import { Badge, Card, CardBody, CardHeader, Field, formatDate, Input, Select, Switch } from "@assistpro/ui"
+import { Badge, Card, CardBody, CardHeader, cn, Field, formatDate, Input, Select, Switch } from "@assistpro/ui"
 import { Info } from "lucide-react"
 import { useState } from "react"
+
+type Tab = "servicos" | "cobranca" | "horarios"
+
+const tabs: { value: Tab; label: string }[] = [
+  { value: "servicos",  label: "Serviços"  },
+  { value: "cobranca",  label: "Cobrança"  },
+  { value: "horarios",  label: "Horários"  },
+]
 
 const weekdayNames: Record<string, string> = {
   SEG: "Segunda",
@@ -26,6 +35,7 @@ const weekdayNames: Record<string, string> = {
  * integração real vai gravar.
  */
 export function SettingsView() {
+  const [activeTab, setActiveTab] = useState<Tab>("servicos")
   const [pixKeyValue, setPixKeyValue] = useState(pixKey)
   const [billingDay, setBillingDay] = useState(30)
   const [defaultBillingType, setDefaultBillingType] = useState<BillingType>("PIX")
@@ -38,10 +48,50 @@ export function SettingsView() {
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Configurações</h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Dados de cobrança, integrações e horário de atendimento.
+          Serviços, cobrança e horários de atendimento.
         </p>
       </header>
 
+      {/* Tab bar */}
+      <nav
+        role="tablist"
+        aria-label="Seções de configuração"
+        className="flex gap-1 rounded-xl border border-border bg-secondary p-1"
+      >
+        {tabs.map((tab) => (
+          <button
+            key={tab.value}
+            role="tab"
+            type="button"
+            aria-selected={activeTab === tab.value}
+            onClick={() => setActiveTab(tab.value)}
+            className={cn(
+              "flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
+              activeTab === tab.value
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* ── Aba: Serviços ─────────────────────────────────────────────────── */}
+      {activeTab === "servicos" ? (
+        <Card>
+          <CardHeader
+            title="Serviços"
+            description="Gerencie os serviços que você oferece e como eles aparecem nos agendamentos."
+          />
+          <CardBody>
+            <ServiceList />
+          </CardBody>
+        </Card>
+      ) : null}
+
+      {/* ── Aba: Cobrança ─────────────────────────────────────────────────── */}
+      {activeTab === "cobranca" ? <>
       <Card>
         <CardHeader title="Integrações" description="Conecte as contas para sair do modo simulado" />
 
@@ -164,27 +214,32 @@ export function SettingsView() {
         </CardBody>
       </Card>
 
-      <Card>
-        <CardHeader title="Horário de atendimento" description="Base para os horários livres oferecidos aos clientes" />
+      </> : null}
 
-        <CardBody>
-          <ul className="flex flex-col gap-2">
-            {businessHours.map((entry) => (
-              <li key={entry.weekday} className="flex items-center justify-between gap-3 text-sm">
-                <span className="font-medium text-foreground">{weekdayNames[entry.weekday]}</span>
+      {/* ── Aba: Horários ─────────────────────────────────────────────────── */}
+      {activeTab === "horarios" ? (
+        <Card>
+          <CardHeader title="Horário de atendimento" description="Base para os horários livres oferecidos aos clientes" />
 
-                {entry.enabled ? (
-                  <span className="text-muted-foreground tabular-nums">
-                    {entry.from} às {entry.to}
-                  </span>
-                ) : (
-                  <span className="text-xs text-muted-foreground">Fechado</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </CardBody>
-      </Card>
+          <CardBody>
+            <ul className="flex flex-col gap-2">
+              {businessHours.map((entry) => (
+                <li key={entry.weekday} className="flex items-center justify-between gap-3 text-sm">
+                  <span className="font-medium text-foreground">{weekdayNames[entry.weekday]}</span>
+
+                  {entry.enabled ? (
+                    <span className="text-muted-foreground tabular-nums">
+                      {entry.from} às {entry.to}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">Fechado</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </CardBody>
+        </Card>
+      ) : null}
     </div>
   )
 }

@@ -48,6 +48,8 @@ export function AppointmentForm() {
   const service = services.find((s) => s.id === serviceId)
   const durationMins = service?.durationMinutes ?? 60
   const maxGroupSize = service?.maxGroupSize ?? null
+  // O tipo de sessão é definido pelo serviço: se tem maxGroupSize é grupo, senão individual
+  const serviceSessionType: "INDIVIDUAL" | "GRUPO" = maxGroupSize ? "GRUPO" : "INDIVIDUAL"
 
   // ── Modo de atendimento ─────────────────────────────────────────────────────
   const [mode, setMode] = useState<AppointmentMode>("PRESENCIAL")
@@ -132,7 +134,7 @@ export function AppointmentForm() {
 
   const canSubmitIndividual = selectedDates.length > 0 && startTime !== "" && availableTimes.includes(startTime)
   const canSubmitGroup = canSubmitIndividual && groupParticipants.length >= 2
-  const canSubmit = sessionType === "INDIVIDUAL" ? canSubmitIndividual : canSubmitGroup
+  const canSubmit = serviceSessionType === "INDIVIDUAL" ? canSubmitIndividual : canSubmitGroup
 
   function formatDateLabel(isoDate: string) {
     const [year, month, day] = isoDate.split("-").map(Number)
@@ -145,87 +147,76 @@ export function AppointmentForm() {
     }).format(date)
   }
 
-  // Serviços que admitem grupo ficam disponíveis no modo grupo
-  const groupCompatibleServices = services.filter(
-    (s) => s.durationMinutes > 0 && (sessionType === "INDIVIDUAL" || s.maxGroupSize !== null),
-  )
+  // Todos os serviços com duração aparecem; o tipo de sessão é derivado do serviço escolhido
+  const availableServices = services.filter((s) => s.durationMinutes > 0)
 
-  // Ao trocar de modo, se o serviço atual não é compatível redefine para o primeiro
-  function handleSessionTypeChange(next: "INDIVIDUAL" | "GRUPO") {
-    setSessionType(next)
-    setGroupParticipants([])
-    setParticipantSelectValue("")
-    if (next === "GRUPO") {
-      const firstGroupService = services.find((s) => s.durationMinutes > 0 && s.maxGroupSize !== null)
-      if (firstGroupService) {
-        setServiceId(firstGroupService.id)
-        setStartTime("")
-      }
+  // Ao trocar de serviço, resetar participantes e horário pois o tipo pode mudar
+  function handleServiceChange(nextServiceId: string) {
+    const nextService = services.find((s) => s.id === nextServiceId)
+    const nextIsGroup = !!nextService?.maxGroupSize
+    setServiceId(nextServiceId)
+    setStartTime("")
+    if (!nextIsGroup) {
+      setGroupParticipants([])
+      setParticipantSelectValue("")
     }
+    // Sincroniza sessionType interno para compatibilidade com submit
+    setSessionType(nextIsGroup ? "GRUPO" : "INDIVIDUAL")
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex max-w-2xl flex-col gap-4">
-      {/* ── Tipo de sessão ─────────────────────────────────────────────────── */}
-      <Card>
-        <CardHeader title="Tipo de sessão" />
-        <CardBody>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleSessionTypeChange("INDIVIDUAL")}
-              className={cn(
-                "flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors",
-                sessionType === "INDIVIDUAL"
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-muted-foreground hover:bg-secondary",
-              )}
-            >
-              <User className="size-4" aria-hidden="true" />
-              Individual
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSessionTypeChange("GRUPO")}
-              className={cn(
-                "flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors",
-                sessionType === "GRUPO"
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-muted-foreground hover:bg-secondary",
-              )}
-            >
-              <Users className="size-4" aria-hidden="true" />
-              Grupo
-            </button>
-          </div>
-        </CardBody>
-      </Card>
+      {/* ── Tipo de sessão (derivado do serviço) ───────────────────────────── */}
+      {/* Exibido apenas como leitura; quem define o tipo é o serviço configurado */}
 
       {/* ── Detalhes ───────────────────────────────────────────────────────── */}
       <Card>
         <CardHeader title="Detalhes" />
         <CardBody className="flex flex-col gap-4">
-          {/* Serviço — no modo grupo só exibe serviços com maxGroupSize */}
+          {/* Serviço */}
           <Field label="Serviço" htmlFor="service">
-            <Select
-              id="service"
-              value={serviceId}
-              onChange={(e) => {
-                setServiceId(e.target.value)
-                setStartTime("")
-              }}
-            >
-              {groupCompatibleServices.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} · {s.durationMinutes} min
-                  {s.maxGroupSize ? ` · até ${s.maxGroupSize} pessoas` : ""}
-                </option>
-              ))}
-            </Select>
+            <div className="flex flex-col gap-2">
+              <Select
+                id="service"
+                value={serviceId}
+                onChange={(e) => handleServiceChange(e.target.value)}
+              >
+                {availableServices.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                    {s.maxGroupSize
+                      ? ` · Grupo (até ${s.maxGroupSize})`
+                      : " · Individual"}
+                    {" · "}{s.durationMinutes < 60 ? `${s.durationMinutes}min` : `${s.durationMinutes / 60}h`}
+                  </option>
+                ))}
+              </Select>
+              {/* Indicador visual do tipo de sessão derivado */}
+              <div
+                className={cn(
+                  "inline-flex w-fit items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold",
+                  serviceSessionType === "GRUPO"
+                    ? "bg-primary-soft text-accent-foreground"
+                    : "bg-secondary text-muted-foreground",
+                )}
+              >
+                {serviceSessionType === "GRUPO" ? (
+                  <>
+                    <Users className="size-3" aria-hidden="true" />
+                    Sessão em grupo · até {maxGroupSize} participantes
+                  </>
+                ) : (
+                  <>
+                    <User className="size-3" aria-hidden="true" />
+                    Sessão individual
+                  </>
+                )}
+              </div>
+            </div>
           </Field>
 
           {/* ── Individual: seleciona um cliente ─────────────────────────── */}
-          {sessionType === "INDIVIDUAL" ? (
+          {serviceSessionType === "INDIVIDUAL" ? (
             <Field label="Cliente" htmlFor="customer">
               <div className="flex items-center gap-2">
                 <Select
@@ -250,7 +241,7 @@ export function AppointmentForm() {
           ) : null}
 
           {/* ── Grupo: adiciona múltiplos clientes ───────────────────────── */}
-          {sessionType === "GRUPO" ? (
+          {serviceSessionType === "GRUPO" ? (
             <div className="flex flex-col gap-3">
               {/* Contador de vagas */}
               <div className="flex items-center justify-between">
@@ -325,7 +316,7 @@ export function AppointmentForm() {
                 </p>
               )}
 
-              {sessionType === "GRUPO" && groupParticipants.length < 2 ? (
+              {serviceSessionType === "GRUPO" && groupParticipants.length < 2 ? (
                 <p className="text-xs text-warning-strong">
                   Adicione pelo menos 2 participantes para salvar.
                 </p>
