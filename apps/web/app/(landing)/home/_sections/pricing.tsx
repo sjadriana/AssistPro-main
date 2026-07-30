@@ -71,7 +71,7 @@ export function Pricing() {
         </div>
 
         {/* Seletor de período */}
-        <div className="mb-6 flex overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
+        <div className="mb-6 flex  rounded-2xl border border-border bg-card shadow-xs">
           {plans.map((plan) => (
             <button
               key={plan.id}

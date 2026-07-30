@@ -7,15 +7,17 @@ import { HelpCircle } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LogoMark } from "../brand/logo"
+import { useRouter } from "next/navigation"
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
+  const router = useRouter()
 
   return (
     <div className="flex h-full flex-col bg-sidebar">
       <div className="flex items-center gap-2 px-4 py-5">
         <LogoMark />
-        <span className="text-lg font-bold tracking-tight text-foreground">assist</span>
+        <span className="text-lg font-bold tracking-tight text-foreground" onClick={() => router.push("/dashboard")}>assist</span>
       </div>
 
       <nav aria-label="Navegação principal" className="flex-1 overflow-y-auto px-3 pb-4">

@@ -34,7 +34,7 @@ export function Hero() {
 
         {/* Subheadline */}
         <p className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-          O AssistPro organiza sua agenda, confirma atendimentos e envia cobranças automaticamente pelo WhatsApp — para você focar no que realmente importa.
+          Nos cuidamos da sua agenda e organizamos seus pagamentos! Tudo para que você possa usar seu tempo no que realmente importa.
         </p>
 
         {/* Highlights */}
@@ -64,9 +64,6 @@ export function Hero() {
           </a>
         </div>
 
-        <p className="mt-4 text-xs text-muted-foreground">
-          Sem cartão de crédito para começar. Cancele quando quiser.
-        </p>
       </div>
     </section>
   )

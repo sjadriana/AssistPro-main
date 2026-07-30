@@ -80,9 +80,9 @@ function dayLabel(date: string): string {
 export function AgendaView() {
   const today = localToday()
 
-  const [view, setView] = useState<ViewId>("semana")
+  const [view, setView] = useState<ViewId>("dia")
   /** Cursor: para "dia" é YYYY-MM-DD; para "semana" é a segunda-feira; para "mês" é YYYY-MM-01. */
-  const [cursor, setCursor] = useState(() => weekStart(today))
+  const [cursor, setCursor] = useState(today)
 
   const [slotsOpen, setSlotsOpen] = useState(false)
   const [blockOpen, setBlockOpen] = useState(false)
