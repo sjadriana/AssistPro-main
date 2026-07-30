@@ -1,5 +1,6 @@
 "use client"
 
+import { RecurringScheduleList } from "@/components/schedules/recurring-schedule-list"
 import { ServiceList } from "@/components/services/service-list"
 import { asaasIsMocked, billingTypeLabels } from "@/lib/asaas"
 import { nextBillingDay } from "@/lib/finance"
@@ -11,12 +12,13 @@ import { Badge, Card, CardBody, CardHeader, cn, Field, formatDate, Input, Select
 import { Info } from "lucide-react"
 import { useState } from "react"
 
-type Tab = "servicos" | "cobranca" | "horarios"
+type Tab = "servicos" | "grade" | "cobranca" | "horarios"
 
 const tabs: { value: Tab; label: string }[] = [
-  { value: "servicos",  label: "Serviços"  },
-  { value: "cobranca",  label: "Cobrança"  },
-  { value: "horarios",  label: "Horários"  },
+  { value: "servicos", label: "Serviços"   },
+  { value: "grade",    label: "Grade Fixa" },
+  { value: "cobranca", label: "Cobrança"   },
+  { value: "horarios", label: "Horários"   },
 ]
 
 const weekdayNames: Record<string, string> = {
@@ -95,6 +97,19 @@ export function SettingsView() {
           />
           <CardBody>
             <ServiceList />
+          </CardBody>
+        </Card>
+      ) : null}
+
+      {/* ── Aba: Grade Fixa ───────────────────────────────────────────────── */}
+      {activeTab === "grade" ? (
+        <Card>
+          <CardHeader
+            title="Grade de horários fixos"
+            description="Crie regras recorrentes por serviço. O sistema gera automaticamente os horários disponíveis na vitrine pública para que os alunos se inscrevam."
+          />
+          <CardBody>
+            <RecurringScheduleList />
           </CardBody>
         </Card>
       ) : null}
