@@ -94,6 +94,8 @@ export function AppointmentForm() {
     setSelectedDates(newDates)
     setDateInputValue("")
     if (selectedDates.length === 0) setStartTime("")
+    // Limpa o erro de data ao adicionar a primeira
+    if (errors.date) setErrors((prev) => { const n = { ...prev }; delete n.date; return n })
   }
 
   function removeDate(date: string) {
@@ -113,6 +115,7 @@ export function AppointmentForm() {
     if (!customer) return
     setGroupParticipants((prev) => [...prev, { customerId: cId, customerName: customer.name }])
     setParticipantSelectValue("")
+    if (errors.participants) setErrors((prev) => { const n = { ...prev }; delete n.participants; return n })
   }
 
   function removeParticipant(cId: string) {
@@ -126,15 +129,40 @@ export function AppointmentForm() {
 
   const groupIsFull = maxGroupSize !== null && groupParticipants.length >= maxGroupSize
 
+  // ── Erros de validação ──────────────────────────────────────────────────────
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
   // ── Submit ──────────────────────────────────────────────────────────────────
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
+
+    const nextErrors: Record<string, string> = {}
+
+    if (serviceSessionType === "GRUPO" && groupParticipants.length < 2) {
+      nextErrors.participants = "Adicione pelo menos 2 participantes para salvar."
+    }
+    if (selectedDates.length === 0) {
+      nextErrors.date = "Selecione pelo menos uma data."
+    }
+    if (selectedDates.length > 0 && startTime === "") {
+      nextErrors.time = "Selecione um horário disponível."
+    }
+    if (selectedDates.length > 0 && startTime !== "" && !availableTimes.includes(startTime)) {
+      nextErrors.time = "Este horário não está mais disponível. Escolha outro."
+    }
+
+    setErrors(nextErrors)
+
+    if (Object.keys(nextErrors).length > 0) {
+      // Rolar até o primeiro campo com erro
+      const firstKey = Object.keys(nextErrors)[0]
+      const el = document.getElementById(`error-${firstKey}`)
+      el?.scrollIntoView({ behavior: "smooth", block: "center" })
+      return
+    }
+
     router.push("/agenda")
   }
-
-  const canSubmitIndividual = selectedDates.length > 0 && startTime !== "" && availableTimes.includes(startTime)
-  const canSubmitGroup = canSubmitIndividual && groupParticipants.length >= 2
-  const canSubmit = serviceSessionType === "INDIVIDUAL" ? canSubmitIndividual : canSubmitGroup
 
   function formatDateLabel(isoDate: string) {
     const [year, month, day] = isoDate.split("-").map(Number)
@@ -316,9 +344,9 @@ export function AppointmentForm() {
                 </p>
               )}
 
-              {serviceSessionType === "GRUPO" && groupParticipants.length < 2 ? (
-                <p className="text-xs text-warning-strong">
-                  Adicione pelo menos 2 participantes para salvar.
+              {errors.participants ? (
+                <p id="error-participants" role="alert" className="text-xs font-medium text-danger-strong">
+                  {errors.participants}
                 </p>
               ) : null}
             </div>
@@ -369,6 +397,12 @@ export function AppointmentForm() {
             </div>
           </Field>
 
+          {errors.date ? (
+            <p id="error-date" role="alert" className="text-xs font-medium text-danger-strong">
+              {errors.date}
+            </p>
+          ) : null}
+
           {selectedDates.length > 0 ? (
             <div className="flex flex-wrap gap-2" role="list" aria-label="Datas selecionadas">
               {selectedDates.map((date) => (
@@ -404,16 +438,28 @@ export function AppointmentForm() {
                   Nenhum horário livre nesta data.
                 </p>
               ) : (
-                <Select
-                  id="start-time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                >
-                  <option value="">Selecionar horário</option>
-                  {availableTimes.map((time) => (
-                    <option key={time} value={time}>{time}</option>
-                  ))}
-                </Select>
+                <>
+                  <Select
+                    id="start-time"
+                    value={startTime}
+                    onChange={(e) => {
+                      setStartTime(e.target.value)
+                      if (errors.time) setErrors((prev) => { const n = { ...prev }; delete n.time; return n })
+                    }}
+                    aria-describedby={errors.time ? "error-time" : undefined}
+                    className={errors.time ? "border-danger-strong" : ""}
+                  >
+                    <option value="">Selecionar horário</option>
+                    {availableTimes.map((time) => (
+                      <option key={time} value={time}>{time}</option>
+                    ))}
+                  </Select>
+                  {errors.time ? (
+                    <p id="error-time" role="alert" className="text-xs font-medium text-danger-strong">
+                      {errors.time}
+                    </p>
+                  ) : null}
+                </>
               )}
             </Field>
           ) : null}
@@ -591,8 +637,7 @@ export function AppointmentForm() {
         </Link>
         <button
           type="submit"
-          disabled={!canSubmit}
-          className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
         >
           {selectedDates.length > 1
             ? `Salvar ${selectedDates.length} atendimentos`
