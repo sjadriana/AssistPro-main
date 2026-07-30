@@ -2,10 +2,11 @@
 
 import { Dialog, dialogButtonClass } from "@/components/ui/dialog"
 import { appointments as initialAppointments } from "@/lib/mock/appointments"
+import { serviceById } from "@/lib/mock/services"
 import { DISPLAY_TIMEZONE, LOCALE } from "@assistpro/config"
 import type { Appointment, AppointmentMode, AppointmentStatus } from "@assistpro/types"
 import { AppointmentBadge, Avatar, Card, CardHeader, formatDayMonth, formatTime, Select } from "@assistpro/ui"
-import { Check, CheckCheck, Plus, Search, X } from "lucide-react"
+import { Check, CheckCheck, ExternalLink, Plus, Search, Users, X } from "lucide-react"
 import Link from "next/link"
 import { useMemo, useState } from "react"
 
@@ -172,15 +173,39 @@ export function AppointmentList() {
                         <Avatar name={appointment.customerName} />
 
                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                          <span className="truncate text-sm font-semibold text-card-foreground">
-                            {appointment.customerName}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="truncate text-sm font-semibold text-card-foreground">
+                              {appointment.customerName}
+                            </span>
+                            {appointment.sessionType === "GRUPO" ? (() => {
+                              const svc = serviceById(appointment.serviceId)
+                              const count = (appointment.groupParticipants ?? []).length
+                              const max = svc?.maxGroupSize ?? count
+                              return (
+                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-accent-foreground">
+                                  <Users className="size-3" aria-hidden="true" />
+                                  Grupo {count}/{max}
+                                </span>
+                              )
+                            })() : null}
+                          </div>
                           <span className="truncate text-xs text-muted-foreground">
                             {appointment.serviceName} · {modeLabels[appointment.mode]}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {formatTime(appointment.startsAt)} – {formatTime(appointment.endsAt)}
                           </span>
+                          {appointment.rescheduleToken ? (
+                            <Link
+                              href={`/remarcar/${appointment.rescheduleToken}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-0.5 inline-flex w-fit items-center gap-1 text-xs text-primary transition-opacity hover:opacity-70"
+                            >
+                              <ExternalLink className="size-3" aria-hidden="true" />
+                              Link de reagendamento
+                            </Link>
+                          ) : null}
                         </div>
 
                         <AppointmentBadge status={appointment.status} className="shrink-0 sm:hidden" />

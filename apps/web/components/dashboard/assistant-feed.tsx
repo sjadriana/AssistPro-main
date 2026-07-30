@@ -1,13 +1,14 @@
 import { assistantEvents, mockNow } from "@/lib/mock/assistant"
 import type { AssistantEventKind } from "@assistpro/types"
 import { Card, CardBody, CardHeader, cn, formatRelative } from "@assistpro/ui"
-import { AlertCircle, CalendarClock, CheckCircle2, Clock, UserMinus, Wallet, Send, CalendarPlus } from "lucide-react"
+import { AlertCircle, CalendarClock, CheckCircle2, Clock, UserMinus, Wallet, Send, CalendarPlus, ReceiptText } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import Link from "next/link"
 
 /** Ícones usados nos botões de ação sugerida. */
 const actionIconMap: Record<string, LucideIcon> = {
   "Enviar cobrança": Send,
+  "Criar cobrança": ReceiptText,
   "Oferecer horário": CalendarPlus,
   "Remarcar": CalendarClock,
 }
@@ -19,6 +20,7 @@ const eventVisuals: Record<AssistantEventKind, { icon: LucideIcon; tone: string 
   REAGENDAMENTO_SOLICITADO: { icon: CalendarClock, tone: "bg-warning-soft text-warning-strong" },
   CLIENTE_INATIVO: { icon: UserMinus, tone: "bg-secondary text-muted-foreground" },
   RETORNO_SUGERIDO: { icon: Clock, tone: "bg-primary-soft text-primary" },
+  COBRANCA_PENDENTE: { icon: ReceiptText, tone: "bg-danger-soft text-danger-strong" },
 }
 
 export function AssistantFeed() {

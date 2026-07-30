@@ -4,11 +4,10 @@ import { availableTimesForDate, isDateInPastOrToday } from "@/lib/agenda"
 import { appointments } from "@/lib/mock/appointments"
 import { blockedSlots } from "@/lib/mock/blocked-slots"
 import { customers } from "@/lib/mock/customers"
-import { services } from "@/lib/mock/services"
-import { businessHours } from "@/lib/mock/services"
-import type { AppointmentMode, AppointmentRecurrence } from "@assistpro/types"
+import { businessHours, services } from "@/lib/mock/services"
+import type { AppointmentMode, AppointmentRecurrence, GroupParticipant } from "@assistpro/types"
 import { Card, CardBody, CardHeader, cn, Field, Input, RadioCard, Select, Textarea } from "@assistpro/ui"
-import { CalendarCheck, Home, MapPin, Pencil, Plus, RefreshCcw, Video, X } from "lucide-react"
+import { CalendarCheck, Home, MapPin, Pencil, Plus, RefreshCcw, Users, User, Video, X } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
@@ -33,38 +32,53 @@ const recurrenceOptions: { value: AppointmentRecurrence; label: string }[] = [
 export function AppointmentForm() {
   const router = useRouter()
 
+  // ── Modo de sessão ──────────────────────────────────────────────────────────
+  const [sessionType, setSessionType] = useState<"INDIVIDUAL" | "GRUPO">("INDIVIDUAL")
+
+  // ── Individual ──────────────────────────────────────────────────────────────
   const [customerId, setCustomerId] = useState(customers[0].id)
+
+  // ── Grupo ───────────────────────────────────────────────────────────────────
+  const [groupParticipants, setGroupParticipants] = useState<GroupParticipant[]>([])
+  const [participantSelectValue, setParticipantSelectValue] = useState("")
+
+  // ── Serviço ─────────────────────────────────────────────────────────────────
   const [serviceId, setServiceId] = useState(services.filter((s) => s.durationMinutes > 0)[0].id)
+
+  const service = services.find((s) => s.id === serviceId)
+  const durationMins = service?.durationMinutes ?? 60
+  const maxGroupSize = service?.maxGroupSize ?? null
+
+  // ── Modo de atendimento ─────────────────────────────────────────────────────
   const [mode, setMode] = useState<AppointmentMode>("PRESENCIAL")
   const [useDefaultLink, setUseDefaultLink] = useState(true)
   const [meetingUrl, setMeetingUrl] = useState("")
+
+  // ── Observações ─────────────────────────────────────────────────────────────
   const [notes, setNotes] = useState("")
+
+  // ── Lembretes ───────────────────────────────────────────────────────────────
   const [sendConfirmationNow, setSendConfirmationNow] = useState(true)
   const [remind24h, setRemind24h] = useState(true)
   const [remind30min, setRemind30min] = useState(true)
 
-  // Múltiplos dias
+  // ── Datas ───────────────────────────────────────────────────────────────────
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [dateInputValue, setDateInputValue] = useState("")
-
-  // Horário — calculado a partir do primeiro dia selecionado
   const [startTime, setStartTime] = useState("")
 
-  // Recorrência
+  // ── Recorrência ─────────────────────────────────────────────────────────────
   const [recurring, setRecurring] = useState(false)
   const [recurrence, setRecurrence] = useState<AppointmentRecurrence>("SEMANAL")
 
-  const service = services.find((s) => s.id === serviceId)
-  const durationMins = service?.durationMinutes ?? 60
-
-  /** Horários disponíveis para o primeiro dia selecionado. */
+  // ── Horários disponíveis ────────────────────────────────────────────────────
   const availableTimes = useMemo(() => {
     const date = selectedDates[0]
     if (!date) return []
     return availableTimesForDate(date, appointments, blockedSlots, businessHours, durationMins, NOW_ISO)
   }, [selectedDates, durationMins])
 
-  /** Datas não disponíveis (passado ou hoje). */
+  // ── Helpers: datas ──────────────────────────────────────────────────────────
   function isUnavailableDate(date: string) {
     return isDateInPastOrToday(date, TODAY)
   }
@@ -72,12 +86,11 @@ export function AppointmentForm() {
   function handleAddDate() {
     const value = dateInputValue.trim()
     if (!value) return
-    if (isUnavailableDate(value)) return // impede data passada
+    if (isUnavailableDate(value)) return
     if (selectedDates.includes(value)) return
     const newDates = [...selectedDates, value].sort()
     setSelectedDates(newDates)
     setDateInputValue("")
-    // Ao adicionar o primeiro dia, limpa o horário selecionado
     if (selectedDates.length === 0) setStartTime("")
   }
 
@@ -89,48 +102,110 @@ export function AppointmentForm() {
     })
   }
 
+  // ── Helpers: participantes ──────────────────────────────────────────────────
+  function addParticipant(cId: string) {
+    if (!cId) return
+    if (groupParticipants.some((p) => p.customerId === cId)) return
+    if (maxGroupSize !== null && groupParticipants.length >= maxGroupSize) return
+    const customer = customers.find((c) => c.id === cId)
+    if (!customer) return
+    setGroupParticipants((prev) => [...prev, { customerId: cId, customerName: customer.name }])
+    setParticipantSelectValue("")
+  }
+
+  function removeParticipant(cId: string) {
+    setGroupParticipants((prev) => prev.filter((p) => p.customerId !== cId))
+  }
+
+  // Clientes ainda não adicionados ao grupo
+  const availableCustomers = customers.filter(
+    (c) => !groupParticipants.some((p) => p.customerId === c.id),
+  )
+
+  const groupIsFull = maxGroupSize !== null && groupParticipants.length >= maxGroupSize
+
+  // ── Submit ──────────────────────────────────────────────────────────────────
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
-    // Em produção: POST /api/appointments com os dados abaixo
     router.push("/agenda")
   }
 
-  const canSubmit = selectedDates.length > 0 && startTime !== "" && availableTimes.includes(startTime)
+  const canSubmitIndividual = selectedDates.length > 0 && startTime !== "" && availableTimes.includes(startTime)
+  const canSubmitGroup = canSubmitIndividual && groupParticipants.length >= 2
+  const canSubmit = sessionType === "INDIVIDUAL" ? canSubmitIndividual : canSubmitGroup
 
   function formatDateLabel(isoDate: string) {
     const [year, month, day] = isoDate.split("-").map(Number)
     const date = new Date(Date.UTC(year, month - 1, day))
-    return new Intl.DateTimeFormat("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit", timeZone: "UTC" }).format(date)
+    return new Intl.DateTimeFormat("pt-BR", {
+      weekday: "short",
+      day: "2-digit",
+      month: "2-digit",
+      timeZone: "UTC",
+    }).format(date)
+  }
+
+  // Serviços que admitem grupo ficam disponíveis no modo grupo
+  const groupCompatibleServices = services.filter(
+    (s) => s.durationMinutes > 0 && (sessionType === "INDIVIDUAL" || s.maxGroupSize !== null),
+  )
+
+  // Ao trocar de modo, se o serviço atual não é compatível redefine para o primeiro
+  function handleSessionTypeChange(next: "INDIVIDUAL" | "GRUPO") {
+    setSessionType(next)
+    setGroupParticipants([])
+    setParticipantSelectValue("")
+    if (next === "GRUPO") {
+      const firstGroupService = services.find((s) => s.durationMinutes > 0 && s.maxGroupSize !== null)
+      if (firstGroupService) {
+        setServiceId(firstGroupService.id)
+        setStartTime("")
+      }
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex max-w-2xl flex-col gap-4">
-      {/* Detalhes */}
+      {/* ── Tipo de sessão ─────────────────────────────────────────────────── */}
+      <Card>
+        <CardHeader title="Tipo de sessão" />
+        <CardBody>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleSessionTypeChange("INDIVIDUAL")}
+              className={cn(
+                "flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors",
+                sessionType === "INDIVIDUAL"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground hover:bg-secondary",
+              )}
+            >
+              <User className="size-4" aria-hidden="true" />
+              Individual
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSessionTypeChange("GRUPO")}
+              className={cn(
+                "flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors",
+                sessionType === "GRUPO"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground hover:bg-secondary",
+              )}
+            >
+              <Users className="size-4" aria-hidden="true" />
+              Grupo
+            </button>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* ── Detalhes ───────────────────────────────────────────────────────── */}
       <Card>
         <CardHeader title="Detalhes" />
         <CardBody className="flex flex-col gap-4">
-          <Field label="Cliente" htmlFor="customer">
-            <div className="flex items-center gap-2">
-              <Select
-                id="customer"
-                value={customerId}
-                onChange={(e) => setCustomerId(e.target.value)}
-                className="flex-1"
-              >
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </Select>
-              <Link
-                href="/clientes/novo"
-                className="inline-flex size-10.5 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary"
-              >
-                <Plus className="size-4" aria-hidden="true" />
-                <span className="sr-only">Cadastrar novo cliente</span>
-              </Link>
-            </div>
-          </Field>
-
+          {/* Serviço — no modo grupo só exibe serviços com maxGroupSize */}
           <Field label="Serviço" htmlFor="service">
             <Select
               id="service"
@@ -140,40 +215,144 @@ export function AppointmentForm() {
                 setStartTime("")
               }}
             >
-              {services
-                .filter((s) => s.durationMinutes > 0)
-                .map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} · {s.durationMinutes} min
-                  </option>
-                ))}
+              {groupCompatibleServices.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name} · {s.durationMinutes} min
+                  {s.maxGroupSize ? ` · até ${s.maxGroupSize} pessoas` : ""}
+                </option>
+              ))}
             </Select>
           </Field>
+
+          {/* ── Individual: seleciona um cliente ─────────────────────────── */}
+          {sessionType === "INDIVIDUAL" ? (
+            <Field label="Cliente" htmlFor="customer">
+              <div className="flex items-center gap-2">
+                <Select
+                  id="customer"
+                  value={customerId}
+                  onChange={(e) => setCustomerId(e.target.value)}
+                  className="flex-1"
+                >
+                  {customers.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </Select>
+                <Link
+                  href="/clientes/novo"
+                  className="inline-flex size-10.5 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary"
+                >
+                  <Plus className="size-4" aria-hidden="true" />
+                  <span className="sr-only">Cadastrar novo cliente</span>
+                </Link>
+              </div>
+            </Field>
+          ) : null}
+
+          {/* ── Grupo: adiciona múltiplos clientes ───────────────────────── */}
+          {sessionType === "GRUPO" ? (
+            <div className="flex flex-col gap-3">
+              {/* Contador de vagas */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-foreground">Participantes</span>
+                {maxGroupSize !== null ? (
+                  <span
+                    className={cn(
+                      "rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                      groupIsFull
+                        ? "bg-danger-soft text-danger-strong"
+                        : "bg-primary-soft text-accent-foreground",
+                    )}
+                  >
+                    {groupParticipants.length}/{maxGroupSize}
+                  </span>
+                ) : null}
+              </div>
+
+              {/* Chips dos participantes */}
+              {groupParticipants.length > 0 ? (
+                <div className="flex flex-wrap gap-2" role="list" aria-label="Participantes do grupo">
+                  {groupParticipants.map((p) => (
+                    <span
+                      key={p.customerId}
+                      role="listitem"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary-soft px-2.5 py-1 text-xs font-semibold text-accent-foreground"
+                    >
+                      <User className="size-3 shrink-0" aria-hidden="true" />
+                      {p.customerName}
+                      <button
+                        type="button"
+                        onClick={() => removeParticipant(p.customerId)}
+                        className="ml-0.5 rounded-sm text-accent-foreground/60 hover:text-accent-foreground"
+                        aria-label={`Remover ${p.customerName}`}
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">Nenhum participante adicionado ainda.</p>
+              )}
+
+              {/* Adicionar participante */}
+              {!groupIsFull ? (
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={participantSelectValue}
+                    onChange={(e) => setParticipantSelectValue(e.target.value)}
+                    className="flex-1"
+                    aria-label="Selecionar participante"
+                  >
+                    <option value="">Selecionar cliente...</option>
+                    {availableCustomers.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </Select>
+                  <button
+                    type="button"
+                    onClick={() => addParticipant(participantSelectValue)}
+                    disabled={!participantSelectValue}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <Plus className="size-4" aria-hidden="true" />
+                    Adicionar
+                  </button>
+                </div>
+              ) : (
+                <p className="rounded-xl border border-border bg-secondary px-3.5 py-2.5 text-sm text-muted-foreground">
+                  Grupo completo ({maxGroupSize} participantes).
+                </p>
+              )}
+
+              {sessionType === "GRUPO" && groupParticipants.length < 2 ? (
+                <p className="text-xs text-warning-strong">
+                  Adicione pelo menos 2 participantes para salvar.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </CardBody>
       </Card>
 
-      {/* Datas e horário */}
+      {/* ── Datas e horário ────────────────────────────────────────────────── */}
       <Card>
         <CardHeader
           title="Datas e horário"
           description="Selecione uma ou mais datas futuras. O horário é filtrado conforme a disponibilidade."
         />
         <CardBody className="flex flex-col gap-4">
-          {/* Seletor de data */}
           <Field label="Adicionar data" htmlFor="date-input">
             <div className="flex items-center gap-2">
               <Input
                 id="date-input"
                 type="date"
                 value={dateInputValue}
-                min={
-                  // min = amanhã
-                  (() => {
-                    const [y, mo, d] = TODAY.split("-").map(Number)
-                    const tomorrow = new Date(Date.UTC(y, mo - 1, d + 1))
-                    return tomorrow.toISOString().slice(0, 10)
-                  })()
-                }
+                min={(() => {
+                  const [y, mo, d] = TODAY.split("-").map(Number)
+                  const tomorrow = new Date(Date.UTC(y, mo - 1, d + 1))
+                  return tomorrow.toISOString().slice(0, 10)
+                })()}
                 onChange={(e) => setDateInputValue(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.nativeEvent.isComposing) {
@@ -186,7 +365,11 @@ export function AppointmentForm() {
               <button
                 type="button"
                 onClick={handleAddDate}
-                disabled={!dateInputValue || isUnavailableDate(dateInputValue) || selectedDates.includes(dateInputValue)}
+                disabled={
+                  !dateInputValue ||
+                  isUnavailableDate(dateInputValue) ||
+                  selectedDates.includes(dateInputValue)
+                }
                 className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Plus className="size-4" aria-hidden="true" />
@@ -195,7 +378,6 @@ export function AppointmentForm() {
             </div>
           </Field>
 
-          {/* Chips das datas selecionadas */}
           {selectedDates.length > 0 ? (
             <div className="flex flex-wrap gap-2" role="list" aria-label="Datas selecionadas">
               {selectedDates.map((date) => (
@@ -221,9 +403,11 @@ export function AppointmentForm() {
             <p className="text-xs text-muted-foreground">Nenhuma data selecionada ainda.</p>
           )}
 
-          {/* Horário disponível */}
           {selectedDates.length > 0 ? (
-            <Field label={`Horário disponível para ${formatDateLabel(selectedDates[0])}`} htmlFor="start-time">
+            <Field
+              label={`Horário disponível para ${formatDateLabel(selectedDates[0])}`}
+              htmlFor="start-time"
+            >
               {availableTimes.length === 0 ? (
                 <p className="rounded-xl border border-border bg-secondary px-3.5 py-2.5 text-sm text-muted-foreground">
                   Nenhum horário livre nesta data.
@@ -245,7 +429,7 @@ export function AppointmentForm() {
         </CardBody>
       </Card>
 
-      {/* Recorrência */}
+      {/* ── Recorrência ────────────────────────────────────────────────────── */}
       <Card>
         <CardHeader title="Recorrência" description="Repete este atendimento automaticamente." />
         <CardBody className="flex flex-col gap-3">
@@ -278,7 +462,7 @@ export function AppointmentForm() {
         </CardBody>
       </Card>
 
-      {/* Tipo de atendimento */}
+      {/* ── Tipo de atendimento ────────────────────────────────────────────── */}
       <Card>
         <CardHeader title="Tipo de atendimento" />
         <CardBody className="flex flex-col gap-4">
@@ -316,8 +500,15 @@ export function AppointmentForm() {
                 />
                 <span className="flex flex-1 flex-col gap-2">
                   <span className="text-sm text-foreground">Usar link padrão</span>
-                  <span className={cn("flex items-center gap-2 rounded-xl border border-input bg-card px-3.5 py-2.5", !useDefaultLink && "opacity-50")}>
-                    <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{DEFAULT_MEETING_URL}</span>
+                  <span
+                    className={cn(
+                      "flex items-center gap-2 rounded-xl border border-input bg-card px-3.5 py-2.5",
+                      !useDefaultLink && "opacity-50",
+                    )}
+                  >
+                    <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                      {DEFAULT_MEETING_URL}
+                    </span>
                     <Pencil className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                   </span>
                 </span>
@@ -347,7 +538,7 @@ export function AppointmentForm() {
         </CardBody>
       </Card>
 
-      {/* Lembretes */}
+      {/* ── Lembretes ─────────────────────────────────────────────────────── */}
       <Card>
         <CardHeader
           title="Lembretes e confirmações"
@@ -355,21 +546,36 @@ export function AppointmentForm() {
         />
         <CardBody className="flex flex-col gap-3">
           <label className="flex cursor-pointer items-center gap-2.5">
-            <input type="checkbox" checked={sendConfirmationNow} onChange={(e) => setSendConfirmationNow(e.target.checked)} className="size-4 rounded accent-primary" />
+            <input
+              type="checkbox"
+              checked={sendConfirmationNow}
+              onChange={(e) => setSendConfirmationNow(e.target.checked)}
+              className="size-4 rounded accent-primary"
+            />
             <span className="text-sm text-foreground">Enviar confirmação agora por WhatsApp</span>
           </label>
           <label className="flex cursor-pointer items-center gap-2.5">
-            <input type="checkbox" checked={remind24h} onChange={(e) => setRemind24h(e.target.checked)} className="size-4 rounded accent-primary" />
+            <input
+              type="checkbox"
+              checked={remind24h}
+              onChange={(e) => setRemind24h(e.target.checked)}
+              className="size-4 rounded accent-primary"
+            />
             <span className="text-sm text-foreground">Lembrete 24 horas antes</span>
           </label>
           <label className="flex cursor-pointer items-center gap-2.5">
-            <input type="checkbox" checked={remind30min} onChange={(e) => setRemind30min(e.target.checked)} className="size-4 rounded accent-primary" />
+            <input
+              type="checkbox"
+              checked={remind30min}
+              onChange={(e) => setRemind30min(e.target.checked)}
+              className="size-4 rounded accent-primary"
+            />
             <span className="text-sm text-foreground">Lembrete 30 minutos antes</span>
           </label>
         </CardBody>
       </Card>
 
-      {/* Observações */}
+      {/* ── Observações ───────────────────────────────────────────────────── */}
       <Card>
         <CardHeader title="Observações" />
         <CardBody>

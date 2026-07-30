@@ -73,4 +73,13 @@ export const assistantEvents: AssistantEvent[] = [
     customerId: "cus-8",
     suggestedAction: { label: "Enviar mensagem", href: "/clientes/cus-8" },
   },
+  {
+    id: "evt-6",
+    kind: "COBRANCA_PENDENTE",
+    message: "Aula de Tênis em grupo de hoje (10:00) não tem cobrança criada.",
+    detail: "4 participantes · Aula de Tênis",
+    createdAt: "2024-05-22T10:05:00.000Z",
+    customerId: "cus-2",
+    suggestedAction: { label: "Criar cobrança", href: "/financeiro/nova" },
+  },
 ]

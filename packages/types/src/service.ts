@@ -9,6 +9,12 @@ export interface Service extends Auditable, SoftDeletable {
   price: Cents
   color: ServiceColor
   active: boolean
+  /**
+   * Quando definido (> 1), o serviço admite agendamento em grupo
+   * com no máximo este número de participantes.
+   * null = apenas individual.
+   */
+  maxGroupSize: number | null
 }
 
 /** Cores usadas nos blocos da agenda. */
