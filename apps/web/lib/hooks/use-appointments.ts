@@ -2,24 +2,18 @@ import {
   cancelAppointment,
   createAppointment,
   listAppointments,
-  listBlockedSlots,
   listFreeSlots,
   updateAppointmentStatus,
 } from "@/lib/api/appointments"
-import type {
-  Appointment,
-  AppointmentFilters,
-  AppointmentStatus,
-  BlockedSlot,
-  CreateAppointmentInput,
-  FreeSlot,
-} from "@assistpro/types"
+import type { Appointment, AppointmentStatus, FreeSlot } from "@assistpro/types"
+
+type CreateAppointmentInput = Parameters<typeof createAppointment>[0]
 import useSWR from "swr"
 
 // ── Listagem ─────────────────────────────────────────────────────────────────
 
-export function useAppointments(filters?: Partial<AppointmentFilters>) {
-  const key = ["appointments", filters?.query ?? "", filters?.status ?? "TODOS"]
+export function useAppointments(filters?: { status?: AppointmentStatus; date?: string; customerId?: string }) {
+  const key = ["appointments", JSON.stringify(filters ?? {})]
   const { data, isLoading, error, mutate } = useSWR<Appointment[]>(
     key,
     () => listAppointments(filters),
@@ -37,20 +31,10 @@ export function useFreeSlots() {
   return { freeSlots: data ?? [], isLoading, error, mutate }
 }
 
-// ── Bloqueios ────────────────────────────────────────────────────────────────
-
-export function useBlockedSlots() {
-  const { data, isLoading, error, mutate } = useSWR<BlockedSlot[]>(
-    "blocked-slots",
-    listBlockedSlots,
-  )
-  return { blockedSlots: data ?? [], isLoading, error, mutate }
-}
-
 // ── Mutations ────────────────────────────────────────────────────────────────
 
 export function useAppointmentMutations() {
-  const { mutate } = useSWR<Appointment[]>("appointments")
+  const { mutate } = useSWR<Appointment[]>(["appointments", "{}"])
 
   async function create(input: CreateAppointmentInput) {
     await createAppointment(input)

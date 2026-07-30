@@ -75,8 +75,15 @@ export async function cancelAppointment(id: string): Promise<void> {
 /** Lista horários livres do profissional para os próximos dias. */
 export async function listFreeSlots(): Promise<FreeSlot[]> {
   if (IS_MOCK) {
-    const { generateFreeSlots } = await import("@/lib/agenda")
-    return generateFreeSlots()
+    const { freeSlotsForRange } = await import("@/lib/agenda")
+    const { businessHours } = await import("@/lib/mock/services")
+    const { appointments } = await import("@/lib/mock/appointments")
+    // Gera as datas dos próximos 7 dias
+    const dates = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(Date.now() + i * 86400000)
+      return d.toISOString().slice(0, 10)
+    })
+    return freeSlotsForRange(appointments, businessHours, dates, 60)
   }
   return apiFetch<FreeSlot[]>("/appointments/free-slots")
 }

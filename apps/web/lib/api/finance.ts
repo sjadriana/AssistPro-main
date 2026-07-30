@@ -46,11 +46,16 @@ export async function cancelCharge(id: string): Promise<void> {
 
 // ── Resumo financeiro ───────────────────────────────────────────────────────
 
-/** Retorna o resumo financeiro do período atual. */
+/**
+ * Retorna o resumo financeiro calculado a partir das cobranças do mock.
+ * recalculateSummary(charges) é a função existente em lib/finance.ts.
+ */
 export async function getFinanceSummary(period: FinanceFilters["period"]): Promise<FinanceSummary> {
   if (IS_MOCK) {
-    const { getFinanceSummary: mockSummary } = await import("@/lib/finance")
-    return mockSummary(period)
+    const { charges } = await import("@/lib/mock/finance")
+    const { filterByPeriod, recalculateSummary } = await import("@/lib/finance")
+    const filtered = filterByPeriod(charges, period)
+    return recalculateSummary(filtered)
   }
   return apiFetch<FinanceSummary>(`/finance/summary?period=${period}`)
 }
@@ -60,8 +65,11 @@ export async function getFinanceSummary(period: FinanceFilters["period"]): Promi
 /** Gera o payload PIX de uma cobrança. */
 export async function getPixCharge(chargeId: string): Promise<PixChargeInfo> {
   if (IS_MOCK) {
-    const { mockPixCharge } = await import("@/lib/mock/finance")
-    return mockPixCharge(chargeId)
+    const { charges, pixKey } = await import("@/lib/mock/finance")
+    const { buildPixPayload } = await import("@/lib/finance")
+    const charge = charges.find((c) => c.id === chargeId)
+    if (!charge) throw new Error(`Charge ${chargeId} not found`)
+    return buildPixPayload(charge, pixKey)
   }
   return apiFetch<PixChargeInfo>(`/finance/charges/${chargeId}/pix`)
 }
@@ -71,8 +79,10 @@ export async function getPixCharge(chargeId: string): Promise<PixChargeInfo> {
 /** Lista clientes com saldo em aberto (inadimplentes). */
 export async function listOverdueBalances(): Promise<OpenCustomerBalance[]> {
   if (IS_MOCK) {
-    const { openBalances } = await import("@/lib/mock/finance")
-    return openBalances
+    const { charges } = await import("@/lib/mock/finance")
+    const { customers } = await import("@/lib/mock/customers")
+    const { openBalancesByCustomer } = await import("@/lib/finance")
+    return openBalancesByCustomer(charges, customers)
   }
   return apiFetch<OpenCustomerBalance[]>("/finance/overdue")
 }
