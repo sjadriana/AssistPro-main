@@ -105,13 +105,13 @@ export function RecurringScheduleList() {
                   </span>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-1">
+                <div className="flex shrink-0 items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => handleToggleActive(rs)}
                     aria-label={rs.active ? "Desativar grade" : "Ativar grade"}
                     className={cn(
-                      "rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors",
+                      "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
                       rs.active
                         ? "bg-success-soft text-success-strong"
                         : "bg-secondary text-muted-foreground",
@@ -123,17 +123,17 @@ export function RecurringScheduleList() {
                     type="button"
                     onClick={() => setMode({ editing: rs })}
                     aria-label="Editar grade"
-                    className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    className="min-h-[44px] min-w-[44px] rounded-xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground flex items-center justify-center"
                   >
-                    <Pencil className="size-3.5" aria-hidden="true" />
+                    <Pencil className="size-4" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(rs.id)}
                     aria-label="Excluir grade"
-                    className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-danger-soft hover:text-danger-strong"
+                    className="min-h-[44px] min-w-[44px] rounded-xl text-muted-foreground transition-colors hover:bg-danger-soft hover:text-danger-strong flex items-center justify-center"
                   >
-                    <Trash2 className="size-3.5" aria-hidden="true" />
+                    <Trash2 className="size-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>
