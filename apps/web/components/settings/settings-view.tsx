@@ -4,9 +4,9 @@ import { ServiceList } from "@/components/services/service-list"
 import { asaasIsMocked, billingTypeLabels } from "@/lib/asaas"
 import { nextBillingDay } from "@/lib/finance"
 import { pixKey } from "@/lib/mock/finance"
-import { businessHours } from "@/lib/mock/services"
+import { businessHours as defaultBusinessHours } from "@/lib/mock/services"
 import { whatsappIsMocked } from "@/lib/whatsapp"
-import type { BillingType } from "@assistpro/types"
+import type { BillingType, BusinessHours } from "@assistpro/types"
 import { Badge, Card, CardBody, CardHeader, cn, Field, formatDate, Input, Select, Switch } from "@assistpro/ui"
 import { Info } from "lucide-react"
 import { useState } from "react"
@@ -34,6 +34,14 @@ const weekdayNames: Record<string, string> = {
  * existe persistência — a tela serve para definir o formato dos dados que a
  * integração real vai gravar.
  */
+function patchHours(
+  hours: BusinessHours[],
+  weekday: string,
+  patch: Partial<BusinessHours>,
+): BusinessHours[] {
+  return hours.map((h) => (h.weekday === weekday ? { ...h, ...patch } : h))
+}
+
 export function SettingsView() {
   const [activeTab, setActiveTab] = useState<Tab>("servicos")
   const [pixKeyValue, setPixKeyValue] = useState(pixKey)
@@ -42,6 +50,7 @@ export function SettingsView() {
   const [lateFee, setLateFee] = useState("2")
   const [interest, setInterest] = useState("1")
   const [autoCharge, setAutoCharge] = useState(true)
+  const [hours, setHours] = useState<BusinessHours[]>(defaultBusinessHours)
 
   return (
     <div className="flex flex-col gap-4">
@@ -219,20 +228,56 @@ export function SettingsView() {
       {/* ── Aba: Horários ─────────────────────────────────────────────────── */}
       {activeTab === "horarios" ? (
         <Card>
-          <CardHeader title="Horário de atendimento" description="Base para os horários livres oferecidos aos clientes" />
+          <CardHeader
+            title="Horário de atendimento"
+            description="Defina os dias e horários em que você atende. Esses dados alimentam os horários livres oferecidos aos clientes."
+          />
 
           <CardBody>
-            <ul className="flex flex-col gap-2">
-              {businessHours.map((entry) => (
-                <li key={entry.weekday} className="flex items-center justify-between gap-3 text-sm">
-                  <span className="font-medium text-foreground">{weekdayNames[entry.weekday]}</span>
-
-                  {entry.enabled ? (
-                    <span className="text-muted-foreground tabular-nums">
-                      {entry.from} às {entry.to}
+            <ul className="flex flex-col divide-y divide-border">
+              {hours.map((entry) => (
+                <li key={entry.weekday} className="flex flex-col gap-3 py-3 first:pt-0 last:pb-0">
+                  {/* Linha do dia: nome + toggle */}
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-foreground">
+                      {weekdayNames[entry.weekday]}
                     </span>
+                    <Switch
+                      checked={entry.enabled}
+                      onChange={(e) =>
+                        setHours((prev) => patchHours(prev, entry.weekday, { enabled: e.target.checked }))
+                      }
+                      label={entry.enabled ? "Aberto" : "Fechado"}
+                      hideLabel
+                    />
+                  </div>
+
+                  {/* Inputs de horário — visíveis apenas quando o dia está ativo */}
+                  {entry.enabled ? (
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Início" htmlFor={`from-${entry.weekday}`}>
+                        <Input
+                          id={`from-${entry.weekday}`}
+                          type="time"
+                          value={entry.from}
+                          onChange={(e) =>
+                            setHours((prev) => patchHours(prev, entry.weekday, { from: e.target.value }))
+                          }
+                        />
+                      </Field>
+                      <Field label="Fim" htmlFor={`to-${entry.weekday}`}>
+                        <Input
+                          id={`to-${entry.weekday}`}
+                          type="time"
+                          value={entry.to}
+                          onChange={(e) =>
+                            setHours((prev) => patchHours(prev, entry.weekday, { to: e.target.value }))
+                          }
+                        />
+                      </Field>
+                    </div>
                   ) : (
-                    <span className="text-xs text-muted-foreground">Fechado</span>
+                    <p className="text-xs text-muted-foreground">Fechado — nenhum horário disponível neste dia.</p>
                   )}
                 </li>
               ))}
