@@ -11,6 +11,8 @@ export type AssistantEventKind =
   | "REAGENDAMENTO_SOLICITADO"
   | "CLIENTE_INATIVO"
   | "RETORNO_SUGERIDO"
+  /** Agendamento sem cobrança ativa — alerta para o profissional criar a cobrança. */
+  | "COBRANCA_PENDENTE"
 
 export interface AssistantEvent {
   id: UUID

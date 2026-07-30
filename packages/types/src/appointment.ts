@@ -31,8 +31,18 @@ export interface BlockedSlot extends Auditable, SoftDeletable {
   reason: string | null
 }
 
+/** Participante de um agendamento em grupo. */
+export interface GroupParticipant {
+  customerId: UUID
+  customerName: string
+}
+
 export interface Appointment extends Auditable, SoftDeletable {
   id: UUID
+  /**
+   * Individual: id do cliente único.
+   * Grupo: id do "responsável" / primeiro participante adicionado.
+   */
   customerId: UUID
   customerName: string
   serviceId: UUID
@@ -46,6 +56,20 @@ export interface Appointment extends Auditable, SoftDeletable {
   meetingUrl: string | null
   notes: string | null
   reminders: ReminderConfig
+  /**
+   * "INDIVIDUAL" (padrão) ou "GRUPO".
+   */
+  sessionType: "INDIVIDUAL" | "GRUPO"
+  /**
+   * Lista de participantes quando sessionType === "GRUPO".
+   * Inclui o cliente principal (customerId).
+   */
+  groupParticipants: GroupParticipant[] | null
+  /**
+   * Token opaco usado para gerar o link de reagendamento enviado ao cliente.
+   * Formato: apt-{id}-{timestamp base64url} — gerado no servidor.
+   */
+  rescheduleToken: string | null
 }
 
 export interface CreateAppointmentInput {
