@@ -249,13 +249,13 @@ export function SettingsView() {
           />
 
           <CardBody>
-            <ul className="flex flex-col gap-0">
+            <ul className="flex flex-col">
               {hours.map((entry, idx) => (
                 <li
                   key={entry.weekday}
                   className={cn(
-                    "flex flex-col gap-3 rounded-xl p-3",
-                    idx % 2 === 0 ? "bg-secondary/40" : "",
+                    "flex flex-col gap-3 py-4",
+                    idx !== 0 && "border-t border-border",
                   )}
                 >
                   {/* Linha do dia: nome + toggle */}
