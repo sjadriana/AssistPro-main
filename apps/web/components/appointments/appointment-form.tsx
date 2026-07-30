@@ -55,6 +55,9 @@ export function AppointmentForm() {
   const [mode, setMode] = useState<AppointmentMode>("PRESENCIAL")
   const [useDefaultLink, setUseDefaultLink] = useState(true)
   const [meetingUrl, setMeetingUrl] = useState("")
+  const DEFAULT_ADDRESS = "Rua das Flores, 123 — São Paulo, SP"
+  const [useDefaultAddress, setUseDefaultAddress] = useState(true)
+  const [customAddress, setCustomAddress] = useState("")
 
   // ── Observações ─────────────────────────────────────────────────────────────
   const [notes, setNotes] = useState("")
@@ -522,6 +525,59 @@ export function AppointmentForm() {
               })}
             </div>
           </fieldset>
+
+          {(mode === "PRESENCIAL" || mode === "DOMICILIAR") ? (
+            <fieldset className="flex flex-col gap-3">
+              <legend className="mb-1 text-sm font-medium text-foreground">
+                {mode === "PRESENCIAL" ? "Endereço do atendimento" : "Endereço do domicílio"}
+              </legend>
+
+              <label className="flex cursor-pointer items-start gap-2.5">
+                <input
+                  type="radio"
+                  name="addressOption"
+                  checked={useDefaultAddress}
+                  onChange={() => setUseDefaultAddress(true)}
+                  className="mt-1 size-4 shrink-0 accent-primary"
+                />
+                <span className="flex flex-1 flex-col gap-2">
+                  <span className="text-sm text-foreground">Usar endereço padrão</span>
+                  <span
+                    className={cn(
+                      "flex items-center gap-2 rounded-xl border border-input bg-card px-3.5 py-2.5",
+                      !useDefaultAddress && "opacity-50",
+                    )}
+                  >
+                    <MapPin className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                      {DEFAULT_ADDRESS}
+                    </span>
+                    <Pencil className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  </span>
+                </span>
+              </label>
+
+              <label className="flex cursor-pointer items-start gap-2.5">
+                <input
+                  type="radio"
+                  name="addressOption"
+                  checked={!useDefaultAddress}
+                  onChange={() => setUseDefaultAddress(false)}
+                  className="mt-1 size-4 shrink-0 accent-primary"
+                />
+                <span className="flex flex-1 flex-col gap-2">
+                  <span className="text-sm text-foreground">Inserir outro endereço</span>
+                  <Input
+                    value={customAddress}
+                    onChange={(e) => setCustomAddress(e.target.value)}
+                    placeholder="Digite o endereço completo"
+                    disabled={useDefaultAddress}
+                    aria-label="Endereço do atendimento"
+                  />
+                </span>
+              </label>
+            </fieldset>
+          ) : null}
 
           {mode === "ONLINE" ? (
             <fieldset className="flex flex-col gap-3">

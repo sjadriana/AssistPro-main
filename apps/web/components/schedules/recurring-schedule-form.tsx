@@ -3,7 +3,13 @@
 import { services } from "@/lib/mock/services"
 import type { RecurringSchedule, Weekday } from "@assistpro/types"
 import { cn, Field, Input, Select, Switch } from "@assistpro/ui"
+import { MapPin, Pencil, Video } from "lucide-react"
 import { useState } from "react"
+
+type ScheduleMode = "PRESENCIAL" | "ONLINE"
+
+const DEFAULT_ADDRESS = "Rua das Flores, 123 — São Paulo, SP"
+const DEFAULT_MEETING_URL = "https://meet.google.com/abc-defg-hij"
 
 const weekdays: { value: Weekday; label: string; short: string }[] = [
   { value: "SEG", label: "Segunda",  short: "Seg" },
@@ -30,6 +36,11 @@ export function RecurringScheduleForm({ initial, onSave, onCancel }: Props) {
   const [endTime, setEndTime]             = useState(initial?.endTime ?? "08:00")
   const [maxParticipants, setMaxParticipants] = useState(String(initial?.maxParticipants ?? 6))
   const [active, setActive]               = useState(initial?.active ?? true)
+  const [scheduleMode, setScheduleMode]   = useState<ScheduleMode>("PRESENCIAL")
+  const [useDefaultAddress, setUseDefaultAddress] = useState(true)
+  const [customAddress, setCustomAddress] = useState("")
+  const [useDefaultLink, setUseDefaultLink] = useState(true)
+  const [meetingUrl, setMeetingUrl]       = useState("")
 
   const service = groupServices.find((s) => s.id === serviceId)
   const maxAllowed = service?.maxGroupSize ?? 50
@@ -142,6 +153,130 @@ export function RecurringScheduleForm({ initial, onSave, onCancel }: Props) {
           onChange={(e) => setMaxParticipants(e.target.value)}
         />
       </Field>
+
+      {/* Modo: Presencial ou Online */}
+      <fieldset className="flex flex-col gap-3">
+        <legend className="text-sm font-medium text-foreground">Modalidade</legend>
+
+        <div className="grid grid-cols-2 gap-2">
+          {(["PRESENCIAL", "ONLINE"] as ScheduleMode[]).map((m) => {
+            const Icon = m === "ONLINE" ? Video : MapPin
+            const label = m === "ONLINE" ? "Online" : "Presencial"
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setScheduleMode(m)}
+                aria-pressed={scheduleMode === m}
+                className={cn(
+                  "flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors",
+                  scheduleMode === m
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:bg-secondary",
+                )}
+              >
+                <Icon className="size-4" aria-hidden="true" />
+                {label}
+              </button>
+            )
+          })}
+        </div>
+
+        {scheduleMode === "PRESENCIAL" ? (
+          <div className="flex flex-col gap-2">
+            <label className="flex cursor-pointer items-start gap-2.5">
+              <input
+                type="radio"
+                name="rs-addressOption"
+                checked={useDefaultAddress}
+                onChange={() => setUseDefaultAddress(true)}
+                className="mt-1 size-4 shrink-0 accent-primary"
+              />
+              <span className="flex flex-1 flex-col gap-2">
+                <span className="text-sm text-foreground">Usar endereço padrão</span>
+                <span
+                  className={cn(
+                    "flex items-center gap-2 rounded-xl border border-input bg-card px-3.5 py-2.5",
+                    !useDefaultAddress && "opacity-50",
+                  )}
+                >
+                  <MapPin className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                    {DEFAULT_ADDRESS}
+                  </span>
+                  <Pencil className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                </span>
+              </span>
+            </label>
+
+            <label className="flex cursor-pointer items-start gap-2.5">
+              <input
+                type="radio"
+                name="rs-addressOption"
+                checked={!useDefaultAddress}
+                onChange={() => setUseDefaultAddress(false)}
+                className="mt-1 size-4 shrink-0 accent-primary"
+              />
+              <span className="flex flex-1 flex-col gap-2">
+                <span className="text-sm text-foreground">Inserir outro endereço</span>
+                <Input
+                  value={customAddress}
+                  onChange={(e) => setCustomAddress(e.target.value)}
+                  placeholder="Digite o endereço completo"
+                  disabled={useDefaultAddress}
+                  aria-label="Endereço do atendimento"
+                />
+              </span>
+            </label>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <label className="flex cursor-pointer items-start gap-2.5">
+              <input
+                type="radio"
+                name="rs-linkOption"
+                checked={useDefaultLink}
+                onChange={() => setUseDefaultLink(true)}
+                className="mt-1 size-4 shrink-0 accent-primary"
+              />
+              <span className="flex flex-1 flex-col gap-2">
+                <span className="text-sm text-foreground">Usar link padrão</span>
+                <span
+                  className={cn(
+                    "flex items-center gap-2 rounded-xl border border-input bg-card px-3.5 py-2.5",
+                    !useDefaultLink && "opacity-50",
+                  )}
+                >
+                  <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                    {DEFAULT_MEETING_URL}
+                  </span>
+                  <Pencil className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                </span>
+              </span>
+            </label>
+
+            <label className="flex cursor-pointer items-start gap-2.5">
+              <input
+                type="radio"
+                name="rs-linkOption"
+                checked={!useDefaultLink}
+                onChange={() => setUseDefaultLink(false)}
+                className="mt-1 size-4 shrink-0 accent-primary"
+              />
+              <span className="flex flex-1 flex-col gap-2">
+                <span className="text-sm text-foreground">Inserir outro link</span>
+                <Input
+                  value={meetingUrl}
+                  onChange={(e) => setMeetingUrl(e.target.value)}
+                  placeholder="Cole o link da reunião"
+                  disabled={useDefaultLink}
+                  aria-label="Link da reunião"
+                />
+              </span>
+            </label>
+          </div>
+        )}
+      </fieldset>
 
       {/* Status da grade (só visível ao editar) */}
       {initial ? (

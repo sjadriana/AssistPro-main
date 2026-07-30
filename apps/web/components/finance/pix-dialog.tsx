@@ -2,7 +2,7 @@
 
 import { Dialog, dialogButtonClass } from "@/components/ui/dialog"
 import type { Charge, PixChargeInfo } from "@assistpro/types"
-import { formatCurrency, formatTime } from "@assistpro/ui"
+import { cn, formatCurrency, formatTime } from "@assistpro/ui"
 import { Check, Copy, Info, QrCode } from "lucide-react"
 import { useState } from "react"
 
@@ -72,8 +72,13 @@ export function PixDialog({
           <button
             type="button"
             onClick={copyPayload}
-            className={`${dialogButtonClass.primary} w-full`}
             aria-live="polite"
+            className={cn(
+              "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all",
+              copied
+                ? "bg-success-soft text-success-strong"
+                : dialogButtonClass.primary,
+            )}
           >
             {copied ? (
               <>
