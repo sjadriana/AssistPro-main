@@ -249,22 +249,33 @@ export function SettingsView() {
           />
 
           <CardBody>
-            <ul className="flex flex-col divide-y divide-border">
-              {hours.map((entry) => (
-                <li key={entry.weekday} className="flex flex-col gap-3 py-3 first:pt-0 last:pb-0">
+            <ul className="flex flex-col gap-0">
+              {hours.map((entry, idx) => (
+                <li
+                  key={entry.weekday}
+                  className={cn(
+                    "flex flex-col gap-3 rounded-xl p-3",
+                    idx % 2 === 0 ? "bg-secondary/40" : "",
+                  )}
+                >
                   {/* Linha do dia: nome + toggle */}
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-semibold text-foreground">
                       {weekdayNames[entry.weekday]}
                     </span>
-                    <Switch
-                      checked={entry.enabled}
-                      onChange={(e) =>
-                        setHours((prev) => patchHours(prev, entry.weekday, { enabled: e.target.checked }))
-                      }
-                      label={entry.enabled ? "Aberto" : "Fechado"}
-                      hideLabel
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {entry.enabled ? "Aberto" : "Fechado"}
+                      </span>
+                      <Switch
+                        checked={entry.enabled}
+                        onChange={(e) =>
+                          setHours((prev) => patchHours(prev, entry.weekday, { enabled: e.target.checked }))
+                        }
+                        label={entry.enabled ? "Aberto" : "Fechado"}
+                        hideLabel
+                      />
+                    </div>
                   </div>
 
                   {/* Inputs de horário — visíveis apenas quando o dia está ativo */}
@@ -291,9 +302,7 @@ export function SettingsView() {
                         />
                       </Field>
                     </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">Fechado — nenhum horário disponível neste dia.</p>
-                  )}
+                  ) : null}
                 </li>
               ))}
             </ul>

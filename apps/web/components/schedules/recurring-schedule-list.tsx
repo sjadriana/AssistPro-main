@@ -9,7 +9,7 @@ import {
 } from "@/lib/mock/recurring-schedules"
 import type { RecurringSchedule } from "@assistpro/types"
 import { cn } from "@assistpro/ui"
-import { Clock, Pencil, Plus, Trash2, Users } from "lucide-react"
+import { Check, Clock, Copy, Pencil, Plus, Trash2, Users } from "lucide-react"
 import { useState } from "react"
 
 const weekdayShort: Record<string, string> = {
@@ -22,6 +22,13 @@ type Mode = "list" | "new" | { editing: RecurringSchedule }
 export function RecurringScheduleList() {
   const [schedules, setSchedules] = useState<RecurringSchedule[]>(initialSchedules)
   const [mode, setMode] = useState<Mode>("list")
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  function handleCopyLink(id: string) {
+    navigator.clipboard.writeText(`${window.location.origin}/agendar/${id}`)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2000)
+  }
 
   function handleSave(data: Omit<RecurringSchedule, "id" | "createdAt" | "updatedAt">) {
     const now = new Date().toISOString()
@@ -150,12 +157,20 @@ export function RecurringScheduleList() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/agendar/${rs.id}`)
-                  }}
-                  className="shrink-0 text-xs font-semibold text-primary transition-opacity hover:opacity-70"
+                  onClick={() => handleCopyLink(rs.id)}
+                  aria-label="Copiar link da vitrine"
+                  className={cn(
+                    "flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold transition-all",
+                    copiedId === rs.id
+                      ? "bg-success-soft text-success-strong"
+                      : "text-primary hover:opacity-70",
+                  )}
                 >
-                  Copiar link
+                  {copiedId === rs.id ? (
+                    <><Check className="size-3" aria-hidden="true" /> Copiado!</>
+                  ) : (
+                    <><Copy className="size-3" aria-hidden="true" /> Copiar link</>
+                  )}
                 </button>
               </div>
             </li>

@@ -2,7 +2,7 @@
 
 import { services } from "@/lib/mock/services"
 import type { RecurringSchedule, Weekday } from "@assistpro/types"
-import { cn, Field, Input, Select } from "@assistpro/ui"
+import { cn, Field, Input, Select, Switch } from "@assistpro/ui"
 import { useState } from "react"
 
 const weekdays: { value: Weekday; label: string; short: string }[] = [
@@ -29,6 +29,7 @@ export function RecurringScheduleForm({ initial, onSave, onCancel }: Props) {
   const [startTime, setStartTime]         = useState(initial?.startTime ?? "07:00")
   const [endTime, setEndTime]             = useState(initial?.endTime ?? "08:00")
   const [maxParticipants, setMaxParticipants] = useState(String(initial?.maxParticipants ?? 6))
+  const [active, setActive]               = useState(initial?.active ?? true)
 
   const service = groupServices.find((s) => s.id === serviceId)
   const maxAllowed = service?.maxGroupSize ?? 50
@@ -50,7 +51,7 @@ export function RecurringScheduleForm({ initial, onSave, onCancel }: Props) {
       startTime,
       endTime,
       maxParticipants: Math.min(Number(maxParticipants) || 1, maxAllowed),
-      active: true,
+      active,
     })
   }
 
@@ -141,6 +142,26 @@ export function RecurringScheduleForm({ initial, onSave, onCancel }: Props) {
           onChange={(e) => setMaxParticipants(e.target.value)}
         />
       </Field>
+
+      {/* Status da grade (só visível ao editar) */}
+      {initial ? (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-secondary/40 px-4 py-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-semibold text-foreground">Grade ativa</span>
+            <span className="text-xs text-muted-foreground">
+              {active
+                ? "Aparece na vitrine e aceita inscrições."
+                : "Oculta da vitrine. Nenhuma nova inscrição será aceita."}
+            </span>
+          </div>
+          <Switch
+            checked={active}
+            onChange={(e) => setActive(e.target.checked)}
+            label="Ativar grade"
+            hideLabel
+          />
+        </div>
+      ) : null}
 
       {/* Ações */}
       <div className="flex gap-2">
