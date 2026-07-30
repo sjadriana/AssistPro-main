@@ -133,7 +133,7 @@ export function NewChargeDialog({
           {result.whatsappSent ? (
             <p className="flex items-start gap-2 rounded-xl bg-success-soft px-3 py-2.5 text-xs leading-relaxed text-success-strong">
               <Check className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-              Mensagem de cobrança registrada no histórico de {result.customerName.split(" ")[0]}.
+              Mensagem de cobrança enviada para {result.customerName.split(" ")[0]} e registrada no histórico.
             </p>
           ) : null}
 
