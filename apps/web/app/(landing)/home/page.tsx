@@ -5,6 +5,8 @@ import { Hero } from "./_sections/hero"
 import { Problems } from "./_sections/problems"
 import { Solution } from "./_sections/solution"
 import { Features } from "./_sections/features"
+import { Comparison } from "./_sections/comparison"
+import { Testimonials } from "./_sections/testimonials"
 import { HowItWorks } from "./_sections/how-it-works"
 import { Mission } from "./_sections/mission"
 import { Pricing } from "./_sections/pricing"
@@ -14,7 +16,7 @@ import { CTA } from "./_sections/cta"
 export const metadata: Metadata = {
   title: "AssistPro — Agenda, WhatsApp e cobrança automática para profissionais autônomos",
   description:
-    "Pare de perder tempo com agenda e cobranças. O AssistPro automatiza confirmações, lembretes e cobranças pelo WhatsApp para personal trainers, esteticistas, terapeutas e qualquer profissional autônomo.",
+    "Pare de perder tempo com agenda e cobranças. O AssistPro automatiza confirmações, lembretes e cobranças pelo WhatsApp para personal trainers, professores de tênis, fisioterapeutas, terapeutas e qualquer profissional autônomo.",
 }
 
 export default function LandingPage() {
@@ -26,6 +28,8 @@ export default function LandingPage() {
         <Problems />
         <Solution />
         <Features />
+        <Comparison />
+        <Testimonials />
         <HowItWorks />
         <Mission />
         <Pricing />

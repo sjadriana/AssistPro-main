@@ -6,6 +6,62 @@
 
 ---
 
+## Stack tecnológico — REGRAS OBRIGATÓRIAS
+
+Estas definições são imutáveis. Nenhuma decisão de implementação deve contradizê-las.
+
+### Backend
+| Decisão | Escolha |
+|---|---|
+| Framework | **NestJS** |
+| Linguagem | **TypeScript** (strict mode) |
+| ORM | **Prisma** |
+| Banco de dados | **PostgreSQL** |
+| Validação | **class-validator** + **class-transformer** (DTOs) ou **Zod** (schemas puros) |
+| Logs | **Pino** (via `nestjs-pino`) |
+
+### Infraestrutura
+| Decisão | Escolha |
+|---|---|
+| Cloud | **AWS** |
+| Container | **Docker** (imagem base: `node:20-alpine`) |
+| Proxy reverso | **Nginx** (quando necessário) |
+| Storage de arquivos | **AWS S3** |
+| CDN | **CloudFront** (fase futura) |
+| Cache | **Redis** (ElastiCache em produção) |
+| Filas assíncronas | **BullMQ** — WhatsApp, e-mails, lembretes, cobranças |
+
+### Autenticação e segurança
+| Decisão | Escolha |
+|---|---|
+| Tokens | **JWT** access token (15 min) + **Refresh Token** (7 dias, httpOnly cookie) |
+| Hash de senha | **Argon2** |
+| Controle de acesso | **RBAC** — papéis: `OWNER`, `PROFESSIONAL`, `RECEPTIONIST` |
+
+### Testes
+| Decisão | Escolha |
+|---|---|
+| Unitários e integração | **Vitest** |
+| E2E | **Playwright** |
+
+### Observabilidade
+- **MVP:** apenas logs estruturados via Pino.
+- **Futuro:** Sentry (erros), Grafana + Prometheus (métricas), OpenTelemetry (rastreamento distribuído).
+
+### Regras de implementação derivadas da stack
+1. **Todos os DTOs de entrada devem usar `class-validator`** com decorators (`@IsString()`, `@IsUUID()`, `@IsNotEmpty()`, etc.). Nunca validar manualmente.
+2. **Todas as queries ao banco devem passar pelo Prisma Client.** Nenhuma query SQL raw, exceto em migrations justificadas.
+3. **Nenhuma operação assíncrona pesada na thread principal.** WhatsApp, e-mail, cobrança e lembretes devem ser enfileirados via BullMQ.
+4. **Logs com Pino em todo serviço.** Formato JSON. Campos obrigatórios: `timestamp`, `level`, `service`, `traceId` (UUID da request), `userId` (quando autenticado).
+5. **Senhas nunca trafegam ou são armazenadas em texto plano.** Usar `argon2.hash()` no cadastro e `argon2.verify()` no login.
+6. **Refresh token armazenado como hash no banco**, nunca o valor bruto. Invalida automaticamente ao usar (rotation).
+7. **RBAC via guard NestJS.** Cada endpoint decorado com `@Roles(...)`. Sem lógica de permissão inline nos services.
+8. **Variáveis de ambiente validadas no bootstrap** com Joi ou `@nestjs/config` schema validation. App não sobe com env inválida.
+9. **Docker multi-stage build** para imagem de produção enxuta (builder → runtime).
+10. **Testes de integração com banco real** usando PostgreSQL em Docker Compose. Sem mocks de banco em testes de integração.
+
+---
+
 ## Convenções globais
 
 ### Autenticação
