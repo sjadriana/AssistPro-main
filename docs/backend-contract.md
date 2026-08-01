@@ -1,4 +1,4 @@
-# AssistPro — Contrato de Backend
+# Floua — Contrato de Backend
 
 > Documento gerado a partir do frontend completo.
 > Cada endpoint listado aqui já possui um mock funcional no frontend.

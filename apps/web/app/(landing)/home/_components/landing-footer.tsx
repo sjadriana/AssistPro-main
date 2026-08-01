@@ -38,10 +38,10 @@ export function LandingFooter() {
           <div>
             <div className="flex items-center gap-2">
               <span className="inline-flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-extrabold text-primary-foreground">
-                A
+                F
               </span>
               <span className="text-base font-extrabold tracking-tight text-foreground">
-                assist<span className="text-primary">pro</span>
+                floua
               </span>
             </div>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
@@ -73,7 +73,7 @@ export function LandingFooter() {
 
         {/* Bottom bar */}
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-          <p>&copy; {year} AssistPro. Todos os direitos reservados.</p>
+          <p>&copy; {year} Floua. Todos os direitos reservados.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-foreground">Privacidade</a>
             <a href="#" className="hover:text-foreground">Termos de uso</a>

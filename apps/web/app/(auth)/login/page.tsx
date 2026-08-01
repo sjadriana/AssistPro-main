@@ -6,7 +6,7 @@ import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Entrar",
-  description: "Acesse sua agenda no assist.",
+  description: "Acesse sua agenda no floua.",
 }
 
 export default function LoginPage() {
@@ -16,7 +16,7 @@ export default function LoginPage() {
         <header className="flex flex-col items-center gap-2 text-center">
           <div className="flex items-center gap-2">
             <LogoMark className="size-8" />
-            <span className="text-2xl font-bold tracking-tight text-foreground">assist</span>
+            <span className="text-2xl font-bold tracking-tight text-foreground">floua</span>
           </div>
           <p className="text-sm text-muted-foreground">sua agenda, sua rotina, organizada.</p>
         </header>

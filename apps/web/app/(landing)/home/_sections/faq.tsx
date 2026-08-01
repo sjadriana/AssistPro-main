@@ -7,7 +7,7 @@ import { cn } from "@assistpro/ui"
 const faqs = [
   {
     q: "Preciso instalar algum aplicativo?",
-    a: "Não. O AssistPro é 100% web — você acessa pelo navegador de qualquer dispositivo. Seus clientes também não precisam instalar nada; tudo acontece pelo WhatsApp deles.",
+    a: "Não. O Floua é 100% web — você acessa pelo navegador de qualquer dispositivo. Seus clientes também não precisam instalar nada; tudo acontece pelo WhatsApp deles.",
   },
   {
     q: "Como funciona o período de teste gratuito?",
@@ -30,8 +30,8 @@ const faqs = [
     a: "Sim. Não há contratos de fidelidade nem multas por cancelamento. Você cancela quando quiser e seus dados ficam disponíveis para exportação por 30 dias após o cancelamento.",
   },
   {
-    q: "O AssistPro substitui minha agenda do Google ou iCloud?",
-    a: "O AssistPro é uma agenda completa com foco em automação e financeiro. Não depende de outras agendas para funcionar, mas estamos desenvolvendo integrações com Google Calendar para sincronização.",
+    q: "O Floua substitui minha agenda do Google ou iCloud?",
+    a: "O Floua é uma agenda completa com foco em automação e financeiro. Não depende de outras agendas para funcionar, mas estamos desenvolvendo integrações com Google Calendar para sincronização.",
   },
 ]
 

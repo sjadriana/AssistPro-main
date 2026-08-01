@@ -1,4 +1,4 @@
-# Camada de API — AssistPro Frontend
+# Camada de API — Floua Frontend
 
 ## Visão geral
 

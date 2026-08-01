@@ -45,7 +45,7 @@ export function Hero() {
 
         {/* Subheadline */}
         <p className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-          O AssistPro cuida da sua agenda, envia lembretes automáticos pelo WhatsApp e cobra seus clientes — para você focar só nos atendimentos.
+          O Floua cuida da sua agenda, envia lembretes automáticos pelo WhatsApp e cobra seus clientes — para você focar só nos atendimentos.
         </p>
 
         {/* Highlights */}
@@ -75,31 +75,10 @@ export function Hero() {
           </a>
         </div>
 
-        {/* Prova social inline */}
         <div className="mt-8 flex flex-col items-center gap-2">
-          <div className="flex items-center gap-1" aria-label="Avaliação 5 estrelas">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className="size-4 fill-warning-strong text-warning-strong" aria-hidden="true" />
-            ))}
-          </div>
           <p className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">+200 profissionais</span> já economizam tempo todo dia
+            Pensado do zero para simplificar a rotina de profissionais autônomos e pequenos negócios.
           </p>
-        </div>
-
-        {/* Personas */}
-        <div className="mt-8">
-          <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">Feito para</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {personas.map((p) => (
-              <span
-                key={p}
-                className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground"
-              >
-                {p}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </section>

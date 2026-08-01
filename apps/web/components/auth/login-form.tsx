@@ -26,7 +26,7 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           placeholder="seu@email.com"
-          defaultValue="adriana@assist.app"
+          defaultValue="adriana@floua.app"
           required
         />
       </Field>
