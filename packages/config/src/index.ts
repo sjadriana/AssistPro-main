@@ -1,4 +1,4 @@
-export const APP_NAME = "assist"
+export const APP_NAME = "floua"
 export const APP_TAGLINE = "sua agenda, sua rotina, organizada."
 export const APP_POSITIONING = "Sua assistente pessoal para organizar atendimentos."
 

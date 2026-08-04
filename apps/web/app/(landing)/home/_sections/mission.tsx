@@ -9,7 +9,7 @@ const pillars = [
   {
     icon: Eye,
     label: "Visão",
-    text: "Ser um SaaS enxuto, escalável e administrável de qualquer lugar do mundo, gerando receita recorrente previsível e independência financeira para cada profissional que usamos.",
+    text: "Ser uma plataforma enxuta, escalável e administrável de qualquer lugar do mundo, gerando receita recorrente previsível e independência financeira para cada profissional que usamos.",
   },
   {
     icon: Handshake,
@@ -54,7 +54,7 @@ export function Mission() {
 
         {/* Para quem é */}
         <div className="mt-10 rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
-          <p className="mb-4 text-xs font-bold uppercase tracking-widest text-primary">Para quem é o AssistPro</p>
+          <p className="mb-4 text-xs font-bold uppercase tracking-widest text-primary">Para quem é o Floua</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {[
               "Personal trainers e professores de educação física",

@@ -14,9 +14,9 @@ import { FAQ } from "./_sections/faq"
 import { CTA } from "./_sections/cta"
 
 export const metadata: Metadata = {
-  title: "AssistPro — Agenda, WhatsApp e cobrança automática para profissionais autônomos",
+  title: "Floua — Agenda, WhatsApp e cobrança automática para profissionais autônomos",
   description:
-    "Pare de perder tempo com agenda e cobranças. O AssistPro automatiza confirmações, lembretes e cobranças pelo WhatsApp para personal trainers, professores de tênis, fisioterapeutas, terapeutas e qualquer profissional autônomo.",
+    "Pare de perder tempo com agenda e cobranças. O Floua automatiza confirmações, lembretes e cobranças pelo WhatsApp para personal trainers, professores de tênis, fisioterapeutas, terapeutas e qualquer profissional autônomo.",
 }
 
 export default function LandingPage() {
@@ -29,7 +29,7 @@ export default function LandingPage() {
         <Solution />
         <Features />
         <Comparison />
-        <Testimonials />
+        {/* <Testimonials /> Temporarily disabled until we have real testimonials */} 
         <HowItWorks />
         <Mission />
         <Pricing />

@@ -48,7 +48,7 @@ export function Comparison() {
     <section className="bg-background px-5 py-20">
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">Por que o AssistPro?</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">Por que o Floua?</p>
           <h2 className="text-balance text-3xl font-bold text-foreground sm:text-4xl">
             Chega de fazer no braço o que pode ser automático
           </h2>
@@ -60,8 +60,8 @@ export function Comparison() {
         {/* Cabeçalho da tabela */}
         <div className="mb-2 grid grid-cols-[1fr_1fr_1fr] gap-3 px-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
           <span>O que fazer</span>
-          <span className="text-center text-danger-strong">Sem AssistPro</span>
-          <span className="text-center text-success-strong">Com AssistPro</span>
+          <span className="text-center text-danger-strong">Sem Floua</span>
+          <span className="text-center text-success-strong">Com Floua</span>
         </div>
 
         <div className="flex flex-col gap-2">

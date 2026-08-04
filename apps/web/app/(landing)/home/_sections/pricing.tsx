@@ -78,7 +78,7 @@ export function Pricing() {
               type="button"
               onClick={() => setSelected(plan.id)}
               className={cn(
-                "relative flex flex-1 flex-col items-center gap-0.5 py-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                "relative flex flex-1 rounded-2xl flex-col items-center gap-0.5 py-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                 selected === plan.id
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-secondary hover:text-foreground",

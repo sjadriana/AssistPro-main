@@ -249,7 +249,7 @@ export const charges: Charge[] = [
 ]
 
 /** Chave PIX do profissional, exibida na cobrança simulada. */
-export const pixKey = "assist@profissional.com.br"
+export const pixKey = "floua@profissional.com.br"
 
 export function chargesByCustomer(customerId: string) {
   return charges.filter((charge) => charge.customerId === customerId)

@@ -2,7 +2,7 @@ import { CustomerForm } from "@/components/customers/customer-form"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Novo cliente — assist",
+  title: "Novo cliente — floua",
   description: "Cadastre um novo cliente com contato, preferências e observações.",
 }
 

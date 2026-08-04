@@ -2,7 +2,7 @@ import { AgendaView } from "@/components/agenda/agenda-view"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Agenda — assist",
+  title: "Agenda — floua",
   description: "Visualize seus atendimentos por dia, semana ou mês e encontre horários livres.",
 }
 

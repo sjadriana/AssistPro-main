@@ -9,10 +9,10 @@ export function Solution() {
           A solução
         </span>
         <h2 className="text-balance text-3xl font-bold sm:text-4xl">
-          Sua assistente digital que nunca dorme — e nunca esquece.
+          Menos tempo organizando <span className="text-primary-foreground">Mais tempo atendendo</span>
         </h2>
         <p className="mt-5 text-pretty text-base leading-relaxed text-primary-foreground/80">
-          O AssistPro é uma plataforma SaaS que conecta sua agenda, seus clientes e seu financeiro num único lugar — e automatiza tudo pelo WhatsApp, o canal onde seus clientes já estão. Nada de apps novos para instalar, nada de treinamentos complexos.
+          Floua é uma plataforma que conecta sua agenda, seus clientes e seu financeiro num único lugar, automatiza tudo pelo WhatsApp, o canal onde seus clientes já estão. Nada de apps novos para instalar, nada de treinamentos complexos.
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           {[

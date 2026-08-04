@@ -2,7 +2,7 @@ import { FinanceView } from "@/components/finance/finance-view"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Financeiro — assist",
+  title: "Financeiro — floua",
   description: "Acompanhe receitas previstas, recebidas e pendentes e registre pagamentos dos seus atendimentos.",
 }
 

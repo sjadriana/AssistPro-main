@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const customer = customerById(id)
 
   return {
-    title: customer ? `${customer.name} — assist` : "Cliente — assist",
+    title: customer ? `${customer.name} — floua` : "Cliente — floua",
     description: customer ? `Ficha de ${customer.name}: histórico, financeiro e preferências.` : undefined,
   }
 }

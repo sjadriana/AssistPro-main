@@ -6,7 +6,7 @@ const testimonials = [
     role: "Personal Trainer — São Paulo, SP",
     avatar: "CR",
     stars: 5,
-    text: "Antes eu passava quase 2 horas por dia respondendo WhatsApp e confirmando treinos. Hoje o AssistPro faz tudo isso sozinho. Recuperei tempo que eu usava para atender mais clientes.",
+    text: "Antes eu passava quase 2 horas por dia respondendo WhatsApp e confirmando treinos. Hoje o Floua faz tudo isso sozinho. Recuperei tempo que eu usava para atender mais clientes.",
   },
   {
     name: "Rafael Mendes",
@@ -41,7 +41,7 @@ const testimonials = [
     role: "Massagista Terapêutico — Curitiba, PR",
     avatar: "TS",
     stars: 5,
-    text: "Testei outros sistemas e todos eram complicados demais. O AssistPro é direto ao ponto. Agenda, cobra, lembra — sem burocracia.",
+    text: "Testei outros sistemas e todos eram complicados demais. O Floua é direto ao ponto. Agenda, cobra, lembra — sem burocracia.",
   },
 ]
 
@@ -50,12 +50,11 @@ export function Testimonials() {
     <section className="bg-background px-5 py-20">
       <div className="mx-auto max-w-5xl">
         <div className="mb-12 text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">Depoimentos</p>
           <h2 className="text-balance text-3xl font-bold text-foreground sm:text-4xl">
             Profissionais que recuperaram o controle da agenda
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-pretty text-base text-muted-foreground">
-            Mais de 200 profissionais autônomos já usam o AssistPro para automatizar o dia a dia.
+            Pensado do zero para simplificar a rotina de profissionais autônomos e pequenos negócios.
           </p>
         </div>
 

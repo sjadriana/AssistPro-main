@@ -6,7 +6,7 @@ import { CalendarCheck, CalendarClock, Clock, Receipt } from "lucide-react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Dashboard — assist",
+  title: "Dashboard — floua",
   description: "Resumo do dia: atendimentos, confirmações pendentes e horários livres.",
 }
 

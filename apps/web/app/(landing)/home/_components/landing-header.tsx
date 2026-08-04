@@ -22,10 +22,10 @@ export function LandingHeader() {
         {/* Logo */}
         <Link href="/home" className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
           <span className="inline-flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-extrabold text-primary-foreground">
-            A
+            F
           </span>
           <span className="text-base font-extrabold tracking-tight text-foreground">
-            assist<span className="text-primary">pro</span>
+            floua
           </span>
         </Link>
 

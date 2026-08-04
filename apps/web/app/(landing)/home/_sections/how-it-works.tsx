@@ -39,12 +39,6 @@ export function HowItWorks() {
         </div>
 
         <div className="relative">
-          {/* Linha conectora — visível apenas em desktop */}
-          <div
-            aria-hidden="true"
-            className="absolute left-[22px] top-10 hidden h-[calc(100%-5rem)] w-px bg-border sm:block"
-          />
-
           <div className="flex flex-col gap-6">
             {steps.map((step) => {
               const Icon = step.icon
