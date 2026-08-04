@@ -72,8 +72,7 @@ export default function LoginPage() {
 
         {/* Formulário */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-          <Field>
-            <Label htmlFor="email">E-mail</Label>
+          <Field label="E-mail" htmlFor="email">
             <Input
               id="email"
               type="email"
@@ -83,7 +82,7 @@ export default function LoginPage() {
             />
           </Field>
 
-          <Field>
+          <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Senha</Label>
               <Link
@@ -113,7 +112,7 @@ export default function LoginPage() {
                   : <Eye className="size-4" aria-hidden="true" />}
               </button>
             </div>
-          </Field>
+          </div>
 
           {/* Lembrar de mim */}
           <label className="flex cursor-pointer items-center gap-2">
