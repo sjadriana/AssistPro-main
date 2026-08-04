@@ -3,7 +3,7 @@
 import { currentUser } from "@/lib/mock/assistant"
 import { navigation } from "@/lib/navigation"
 import { Avatar, cn } from "@assistpro/ui"
-import { HelpCircle } from "lucide-react"
+import { HelpCircle, LogOut } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LogoMark } from "../brand/logo"
@@ -12,6 +12,11 @@ import { useRouter } from "next/navigation"
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
   const router = useRouter()
+
+  function handleLogout() {
+    onNavigate?.()
+    router.push("/login")
+  }
 
   return (
     <div className="flex h-full flex-col bg-sidebar">
@@ -69,6 +74,15 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             <span className="text-xs text-muted-foreground">Ver perfil</span>
           </span>
         </Link>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-danger-strong transition-colors hover:bg-danger-soft"
+        >
+          <LogOut className="size-4.5 shrink-0" aria-hidden="true" />
+          Sair
+        </button>
       </div>
     </div>
   )
