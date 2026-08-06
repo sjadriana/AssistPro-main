@@ -1,4 +1,4 @@
-import type { Charge, FinanceSummary } from "@assistpro/types"
+import type { Charge, Expense, FinanceSummary } from "@assistpro/types"
 
 const now = "2024-05-22T12:00:00.000Z"
 const base = { createdAt: now, updatedAt: now, deletedAt: null }
@@ -250,6 +250,104 @@ export const charges: Charge[] = [
 
 /** Chave PIX do profissional, exibida na cobrança simulada. */
 export const pixKey = "floua@profissional.com.br"
+
+// ── Despesas ─────────────────────────────────────────────────────────────────
+
+export const expenses: Expense[] = [
+  {
+    ...base,
+    id: "exp-1",
+    description: "Aluguel da sala",
+    category: "ALUGUEL",
+    amount: 180000,
+    dueDate: "2024-05-10",
+    paidAt: "2024-05-10",
+    status: "PAGO",
+    method: "PIX",
+    recurring: true,
+    notes: null,
+    attachments: [],
+  },
+  {
+    ...base,
+    id: "exp-2",
+    description: "Assinatura floua",
+    category: "PLATAFORMA",
+    amount: 9700,
+    dueDate: "2024-05-15",
+    paidAt: "2024-05-15",
+    status: "PAGO",
+    method: "CARTAO",
+    recurring: true,
+    notes: null,
+    attachments: [],
+  },
+  {
+    ...base,
+    id: "exp-3",
+    description: "Contabilidade mensal",
+    category: "CONTABILIDADE",
+    amount: 45000,
+    dueDate: "2024-05-20",
+    paidAt: null,
+    status: "PENDENTE",
+    method: null,
+    recurring: true,
+    notes: "Pagar via PIX até o dia 20.",
+    attachments: [],
+  },
+  {
+    ...base,
+    id: "exp-4",
+    description: "Aparelho de medição de pressão",
+    category: "EQUIPAMENTO",
+    amount: 32000,
+    dueDate: "2024-05-08",
+    paidAt: "2024-05-08",
+    status: "PAGO",
+    method: "CARTAO",
+    recurring: false,
+    notes: "Nota fiscal anexada.",
+    attachments: [
+      {
+        id: "att-1",
+        name: "nota_fiscal_medidor.pdf",
+        type: "pdf",
+        url: "#",
+        kind: "NOTA_FISCAL",
+        uploadedAt: "2024-05-08T10:00:00.000Z",
+      },
+    ],
+  },
+  {
+    ...base,
+    id: "exp-5",
+    description: "DAS Simples Nacional",
+    category: "IMPOSTOS",
+    amount: 28000,
+    dueDate: "2024-05-07",
+    paidAt: null,
+    status: "ATRASADO",
+    method: null,
+    recurring: true,
+    notes: null,
+    attachments: [],
+  },
+  {
+    ...base,
+    id: "exp-6",
+    description: "Marketing — impulsionamento Instagram",
+    category: "MARKETING",
+    amount: 15000,
+    dueDate: "2024-05-25",
+    paidAt: null,
+    status: "PENDENTE",
+    method: null,
+    recurring: false,
+    notes: null,
+    attachments: [],
+  },
+]
 
 export function chargesByCustomer(customerId: string) {
   return charges.filter((charge) => charge.customerId === customerId)

@@ -91,6 +91,58 @@ export interface OpenCustomerBalance {
   hasOverdue: boolean
 }
 
+// ── Despesas (gastos do próprio negócio) ────────────────────────────────────
+
+export type ExpenseCategory =
+  | "ALUGUEL"
+  | "EQUIPAMENTO"
+  | "PLATAFORMA"
+  | "MARKETING"
+  | "CONTABILIDADE"
+  | "IMPOSTOS"
+  | "SALARIO"
+  | "MANUTENCAO"
+  | "OUTRO"
+
+export type ExpenseStatus = "PAGO" | "PENDENTE" | "ATRASADO"
+
+export interface ExpenseAttachment {
+  id: UUID
+  name: string
+  /** Tipo MIME ou extensão simplificada: "pdf", "jpg", "png", "doc", "xls" */
+  type: string
+  /** URL para download/preview (Blob URL em produção). */
+  url: string
+  /** Categoria do documento. */
+  kind: "COMPROVANTE" | "NOTA_FISCAL" | "RECIBO" | "CONTRATO" | "OUTRO"
+  uploadedAt: ISODateTime
+}
+
+export interface Expense extends Auditable, SoftDeletable {
+  id: UUID
+  description: string
+  category: ExpenseCategory
+  amount: Cents
+  dueDate: ISODate
+  paidAt: ISODate | null
+  status: ExpenseStatus
+  method: PaymentMethod | null
+  /** Recorrência mensal. */
+  recurring: boolean
+  notes: string | null
+  attachments: ExpenseAttachment[]
+}
+
+export interface CreateExpenseInput {
+  description: string
+  category: ExpenseCategory
+  amount: Cents
+  dueDate: ISODate
+  method?: PaymentMethod | null
+  recurring?: boolean
+  notes?: string | null
+}
+
 /**
  * Respostas do gateway. A forma espelha a API do Asaas para que a troca
  * do mock pela integração real não exija mudança na interface.
