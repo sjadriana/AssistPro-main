@@ -7,14 +7,13 @@ import {
   CardBody,
   CardHeader,
   cn,
-  formatCurrency,
   formatDate,
   formatPhone,
   formatTime,
-  PaymentBadge,
 } from "@assistpro/ui"
 import { Pencil } from "lucide-react"
 import { useState } from "react"
+import { CustomerFinanceTab } from "./customer-finance-tab"
 
 const tabs = [
   { id: "geral", label: "Geral" },
@@ -50,10 +49,6 @@ export function CustomerTabs({
   charges: Charge[]
 }) {
   const [tab, setTab] = useState<TabId>("geral")
-
-  const totalPaid = charges
-    .filter((charge) => charge.status === "PAGO")
-    .reduce((sum, charge) => sum + charge.amount, 0)
 
   return (
     <div className="flex flex-col gap-4">
@@ -170,30 +165,7 @@ export function CustomerTabs({
       ) : null}
 
       {tab === "financeiro" ? (
-        <Card>
-          <CardHeader title="Cobranças" action={<span className="text-xs text-muted-foreground">Pago: {formatCurrency(totalPaid)}</span>} />
-          <CardBody className="p-0">
-            {charges.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-muted-foreground">Nenhuma cobrança registrada.</p>
-            ) : (
-              <ul className="flex flex-col">
-                {charges.map((charge) => (
-                  <li
-                    key={charge.id}
-                    className="flex items-center gap-4 border-b border-border px-5 py-3.5 last:border-b-0"
-                  >
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate text-sm font-medium text-card-foreground">{charge.description}</span>
-                      <span className="text-xs text-muted-foreground">Vencimento: {formatDate(charge.dueDate)}</span>
-                    </span>
-                    <span className="text-sm font-semibold text-card-foreground">{formatCurrency(charge.amount)}</span>
-                    <PaymentBadge status={charge.status} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardBody>
-        </Card>
+        <CustomerFinanceTab charges={charges} />
       ) : null}
 
       {tab === "observacoes" ? (
