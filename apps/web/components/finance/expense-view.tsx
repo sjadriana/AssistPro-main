@@ -67,7 +67,7 @@ const statusLabels: Record<ExpenseStatus, string> = {
   ATRASADO: "Atrasado",
 }
 
-const statusVariant: Record<ExpenseStatus, "success" | "warning" | "danger" | "default"> = {
+const statusTone: Record<ExpenseStatus, "success" | "warning" | "danger"> = {
   PAGO: "success",
   PENDENTE: "warning",
   ATRASADO: "danger",
@@ -249,7 +249,7 @@ function ExpenseCard({ expense, onMarkPaid }: { expense: Expense; onMarkPaid: (i
 
         <span className="flex flex-col items-end gap-1">
           <span className="text-sm font-semibold text-foreground">{formatCurrency(expense.amount)}</span>
-          <Badge variant={statusVariant[expense.status]} size="sm">{statusLabels[expense.status]}</Badge>
+          <Badge tone={statusTone[expense.status]}>{statusLabels[expense.status]}</Badge>
         </span>
 
         {expanded
