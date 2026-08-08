@@ -3,9 +3,10 @@
 import { Dialog, dialogButtonClass } from "@/components/ui/dialog"
 import { appointments as initialAppointments } from "@/lib/mock/appointments"
 import { serviceById } from "@/lib/mock/services"
+import { consumeSessionForAppointment } from "@/lib/packages"
 import { DISPLAY_TIMEZONE, LOCALE } from "@assistpro/config"
 import type { Appointment, AppointmentMode, AppointmentStatus } from "@assistpro/types"
-import { AppointmentBadge, Avatar, Card, CardHeader, formatDayMonth, formatTime, Select } from "@assistpro/ui"
+import { AppointmentBadge, Avatar, Badge, Card, CardHeader, formatCurrency, formatDayMonth, formatTime, Select } from "@assistpro/ui"
 import { Check, CheckCheck, ExternalLink, Plus, Search, Users, X } from "lucide-react"
 import Link from "next/link"
 import { useMemo, useState } from "react"
@@ -49,6 +50,7 @@ export function AppointmentList() {
   const [query, setQuery] = useState("")
   const [status, setStatus] = useState<(typeof statusFilters)[number]["value"]>("TODOS")
   const [pendingCancel, setPendingCancel] = useState<Appointment | null>(null)
+  const [extraChargeNotice, setExtraChargeNotice] = useState<{ customerName: string; amount: number } | null>(null)
 
   const groups = useMemo(() => {
     const normalized = query.trim().toLowerCase()

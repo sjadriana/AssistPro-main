@@ -246,6 +246,23 @@ export const charges: Charge[] = [
     method: null,
     paidAt: null,
   },
+  // Sessão extra: pacote de Carla já estava esgotado, cobrança avulsa gerada automaticamente.
+  {
+    ...base,
+    ...manual,
+    id: "chg-extra-1",
+    customerId: "cus-6",
+    customerName: "Carla Mendes",
+    description: "Fisioterapia — sessão extra (pacote esgotado)",
+    dueDate: "2024-05-15",
+    amount: 18000,
+    status: "PAGO",
+    method: "PIX",
+    paidAt: "2024-05-15",
+    billingType: "PIX",
+    origin: "ATENDIMENTO",
+    appointmentId: "apt-5",
+  },
 ]
 
 /** Chave PIX do profissional, exibida na cobrança simulada. */

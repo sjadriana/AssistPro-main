@@ -70,6 +70,13 @@ export interface Appointment extends Auditable, SoftDeletable {
    * Formato: apt-{id}-{timestamp base64url} — gerado no servidor.
    */
   rescheduleToken: string | null
+  /** Pacote ou mensalidade vinculado a este atendimento, se houver. */
+  clientPackageId: UUID | null
+  /**
+   * true quando o atendimento foi concluído sem saldo de pacote disponível
+   * e gerou cobrança extra automaticamente.
+   */
+  wasExtraSession: boolean
 }
 
 export interface CreateAppointmentInput {

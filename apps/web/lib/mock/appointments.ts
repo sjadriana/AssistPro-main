@@ -53,6 +53,8 @@ function slot(
     sessionType: isGroup ? "GRUPO" : "INDIVIDUAL",
     groupParticipants: isGroup ? groupParticipants : null,
     rescheduleToken,
+    clientPackageId: null,
+    wasExtraSession: false,
   }
 }
 
